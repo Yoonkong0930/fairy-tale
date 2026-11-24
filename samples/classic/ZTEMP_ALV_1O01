@@ -1,0 +1,81 @@
+*&---------------------------------------------------------------------*
+*& Include          ZR_JIK_TEMP_ALV_CL1O01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*& Module STATUS_0100 OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE STATUS_0100 OUTPUT.
+
+  PERFORM SET_FCODE_0100.
+
+  CLEAR : GV_TITLE.
+  GV_TITLE = SY-TITLE.
+
+  SET PF-STATUS '0100' EXCLUDING GT_FCODE.
+  SET TITLEBAR '0100' WITH GV_TITLE.
+
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*& Module INIT_0100 OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE INIT_0100 OUTPUT.
+*  Container # ## ## ### ##..
+  IF GO_DCON_0100 IS INITIAL.
+* doc# ### doc with easy# ## ##
+
+*    GO_ALV_INFO->CREATE_ON_DOC( EXPORTING IV_REPID         = GV_REPID
+*                                          IV_DYNNR         = SY-DYNNR
+*                                          IV_EXTENSION     = GV_EXTENSION
+*                                IMPORTING EO_DCON          = GO_DCON_0100
+*                                          EO_GRID          = GO_GRID_0100 ).
+
+
+    GO_ALV_INFO->CREATE_ON_DOC_H( EXPORTING IV_REPID     = GV_REPID
+                                            IV_DYNNR     = SY-DYNNR
+                                            IV_EXTENSION = GV_EXTENSION
+                                            IV_SASH_POSITION = 35   "HEADER ##
+                                  IMPORTING EO_DCON      = GO_DCON_0100
+                                            EO_HEAD      = GO_HEAD_0100
+                                            EO_DOCU      = GO_DOCU_0100
+                                            EO_GRID      = GO_GRID_0100 ).
+
+*## ## ###
+*    GO_ALV_INFO->CREATE_ON_DOC_WITH_EASY( EXPORTING IV_REPID  = GV_REPID
+*                                              IV_DYNNR      = SY-DYNNR
+*                                              IV_EXTENSION  = GV_EXTENSION
+*                                          IMPORTING EO_DCON = GO_DCON_0100
+*                                                 EO_GRID_TOP =  go_top_0100
+*                                                 EO_GRID_BOT =  GO_GRID_0100 ).
+
+
+    PERFORM SET_ALV_LAYOUT_0100.       " SET LAYOUT
+    PERFORM SET_ALV_TOOLBAR_0100.      " SET EXCLUDE_TB
+    PERFORM SET_ALV_VARIENT_0100.      " SET VARIENT
+    PERFORM SET_ALV_FIELDCAT_0100.     " SET FIELD CATAGORY
+    PERFORM SET_ALV_SORTCAT_0100.      " SET SORT FIELD
+    PERFORM SET_ALV_F4_0100.            "Set F4 Button
+    PERFORM SET_ALV_CELLTAB_0100.
+
+    GO_ALV_INFO->SET_EVENT( EXPORTING IV_OBJECT_TEXT = GC_OBJECT_ID_0100
+                                      IO_GRID        = GO_GRID_0100
+                                      IV_ORG_REPID   = GV_ORG_REPID
+                            CHANGING  CO_ALV_EVENT   = GO_ALV_EVENT
+                                      CT_FCAT        = GT_FIELDCAT_0100
+                                      CT_DROP        = GT_DROPDOWN ).
+
+    GO_ALV_INFO->DISPLAY_GRID( '0100' ).
+
+    PERFORM SET_ALV_TOPOFPAGE_0100.     "set top of page
+
+  ELSE.
+
+    GO_ALV_INFO->REFRESH_GRID( '0100' ).
+  ENDIF.
+
+  GO_ALV_INFO->SET_DISPLAY_MODE( '0100' ).
+
+ENDMODULE.
