@@ -1,0 +1,1657 @@
+*&---------------------------------------------------------------------*
+*& Include          ZR_JIK_TEMP_ALV_CL1F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*& Form initialization
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM INITIALIZATION .
+
+  " Program id.
+  GV_REPID             = SY-REPID.
+
+* X = ONLY DISPLAY. SPACE = EDIT ### ###
+*  GV_DISPLAY_MODE_0100 = 'X'.
+
+  IF GO_COMFUNC IS INITIAL.
+    CREATE OBJECT GO_COMFUNC
+      EXPORTING
+        IV_REPID = GV_REPID.
+  ENDIF.
+
+  IF GO_ALV_INFO IS INITIAL.
+    CREATE OBJECT GO_ALV_INFO
+      EXPORTING
+        IV_REPID   = GV_REPID
+        IO_COMFUNC = GO_COMFUNC.
+  ENDIF.
+
+
+  PERFORM CHECK_CARRID_NO USING P_CARRID CHANGING GV_ERROR_FLAG.
+
+
+
+  PERFORM SET_DDLIST_VALUE.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form check_data_input
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      <-- GV_ERROR_FLAG
+*&---------------------------------------------------------------------*
+FORM CHECK_DATA_INPUT  CHANGING PV_ERROR_FLAG.
+
+  PERFORM CHECK_CARRID_NO USING P_CARRID CHANGING PV_ERROR_FLAG.
+  IF PV_ERROR_FLAG = 'X'.
+    EXIT.
+  ENDIF.
+
+  PV_ERROR_FLAG = SPACE.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form GET_DATA
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM GET_DATA .
+
+  CLEAR : GT_SAIRPORT , GT_S0100, GT_T005T.
+  IF P_CARRID IS NOT INITIAL.
+    DATA(CARRID_RANGE) = VALUE CARRID_RANGE(
+     ( SIGN = 'I' OPTION = 'EQ' LOW = P_CARRID HIGH = ' ') ).
+  ENDIF.
+
+
+  IF P_CONTFR IS NOT INITIAL.
+    SET_RANGES : R_COUNTRYFR 'I' 'EQ' P_CONTFR ' '.
+  ENDIF.
+
+  SELECT CARRID,   "#####
+         CONNID,   "### ## ##
+         COUNTRYFR ,"##/## #
+         CITYFROM  ,"## ##
+         AIRPFROM  ,"## ##
+         COUNTRYTO ,"##/## #
+         CITYTO    ,"## ##
+         AIRPTO    ,"## ##
+         FLTIME    ,"## ##
+         DEPTIME   ,"####
+         ARRTIME   ,"####
+         DISTANCE  ,"##
+         DISTID    ,"#### (kms, miles)
+         FLTYPE    ,"### ##
+         PERIOD     "n# # ##
+  FROM SPFLI
+  WHERE CARRID IN @CARRID_RANGE
+    AND CONNID IN @S_CONNID
+    AND COUNTRYFR IN @R_COUNTRYFR
+    AND AIRPFROM IN @S_AIRPFR
+      INTO CORRESPONDING FIELDS OF TABLE @GT_S0100.
+
+  IF GT_S0100 IS INITIAL.
+    MESSAGE S000 WITH TEXT-E01.
+    LEAVE LIST-PROCESSING.
+  ENDIF.
+
+  SELECT *
+   FROM SAIRPORT CLIENT SPECIFIED
+   WHERE MANDT = @SY-MANDT
+   INTO CORRESPONDING FIELDS OF TABLE @GT_SAIRPORT.
+
+  SELECT *
+   FROM T005T
+   WHERE SPRAS = @SY-LANGU
+   INTO CORRESPONDING FIELDS OF TABLE @GT_T005T.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CREATE_DISPLAY_DATA
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CREATE_DISPLAY_DATA .
+
+* ITAB# DB JOIN ## ##
+* Local itab select### ##
+  SELECT A~CARRID, "### ##
+         A~CARRNAME, "#####
+         A~URL       "### URL
+  FROM SCARR AS A INNER JOIN
+        @GT_S0100 AS B
+       ON A~CARRID = B~CARRID
+  INTO TABLE @DATA(LT_SCARR).
+
+  DELETE ADJACENT DUPLICATES FROM LT_SCARR.
+
+
+  LOOP AT GT_S0100 INTO DATA(LS_S0100).
+
+    DATA(LV_IDX) = SY-TABIX.
+
+    READ TABLE GT_T005T INTO DATA(LS_T005T)
+                      WITH KEY LAND1 = LS_S0100-COUNTRYFR.
+    IF SY-SUBRC = 0.
+      LS_S0100-COUNTRYFR_TXT = LS_T005T-LANDX50.
+    ENDIF.
+
+    READ TABLE GT_T005T INTO DATA(LS_T005T1)
+                      WITH KEY LAND1 = LS_S0100-COUNTRYTO.
+    IF SY-SUBRC = 0.
+      LS_S0100-COUNTRYTO_TXT = LS_T005T1-LANDX50.
+    ENDIF.
+
+
+*READ TABLE # ## ##
+*FIELD ### #### ##
+
+*#### #
+    TRY.
+        DATA(LS_SAIRPORT) = GT_SAIRPORT[ ID = LS_S0100-AIRPFROM ].
+      CATCH CX_SY_ITAB_LINE_NOT_FOUND .
+        CLEAR LS_SAIRPORT.
+    ENDTRY.
+
+    IF LS_SAIRPORT IS NOT INITIAL.
+      LS_S0100-AIRPFROM_TXT = LS_SAIRPORT-NAME.
+    ENDIF.
+
+*#### #
+    TRY.
+        LS_SAIRPORT = GT_SAIRPORT[ ID = LS_S0100-AIRPTO ].
+      CATCH CX_SY_ITAB_LINE_NOT_FOUND .
+        CLEAR LS_SAIRPORT.
+    ENDTRY.
+
+    IF LS_SAIRPORT IS NOT INITIAL.
+      LS_S0100-AIRPTO_TXT = LS_SAIRPORT-NAME.
+    ENDIF.
+
+
+*#####
+* LS_SCARR# ## ##  FIELD ### #### LS_S0100#
+* ## BASE# ## ## ###.
+* ### CARRNAME # ## #### ## ###~
+    TRY.
+        DATA(LS_SCARR) = LT_SCARR[ CARRID = LS_S0100-CARRID ].
+      CATCH CX_SY_ITAB_LINE_NOT_FOUND . "<= ST22## ### ##### Except## ##
+        CLEAR LS_SCARR.
+    ENDTRY.
+
+    IF LS_SCARR IS NOT INITIAL.
+* LS_SCARR# ## FIELD## LS_S0100 ##### #### #### ###
+*# ## ##  ####,
+      LS_S0100 = CORRESPONDING #( BASE ( LS_S0100 )  LS_SCARR ).
+*      LS_S0100-CARRNAME = LS_SCARR-CARRNAME.
+    ENDIF.
+
+* #### HANDLE
+    FIND FIRST OCCURRENCE OF LS_S0100-COUNTRYFR+0(1) IN SY-ABCDE
+        IN CHARACTER MODE MATCH OFFSET DATA(LV_OFFSET1).
+
+    FIND FIRST OCCURRENCE OF LS_S0100-COUNTRYFR+1(2) IN SY-ABCDE
+       IN CHARACTER MODE MATCH OFFSET DATA(LV_OFFSET2).
+
+    DATA(LV_OFFSET) = LV_OFFSET1 && LV_OFFSET2.
+
+    LS_S0100-AIRPFROM_HDL =  100100 + LV_OFFSET.
+
+
+* #### HANDLE
+    CLEAR : LV_OFFSET1 , LV_OFFSET2, LV_OFFSET.
+
+    FIND FIRST OCCURRENCE OF LS_S0100-COUNTRYTO+0(1) IN SY-ABCDE
+        IN CHARACTER MODE MATCH OFFSET LV_OFFSET1.
+
+    FIND FIRST OCCURRENCE OF LS_S0100-COUNTRYTO+1(2) IN SY-ABCDE
+       IN CHARACTER MODE MATCH OFFSET LV_OFFSET2.
+
+    LV_OFFSET = LV_OFFSET1 && LV_OFFSET2.
+
+    LS_S0100-AIRPTO_HDL =  100100 + LV_OFFSET.
+* icon_yellow_light.  icon_red_light.
+    LS_S0100-ICON =  ICON_GREEN_LIGHT.
+
+    IF LS_S0100-FLTYPE IS NOT INITIAL.
+*field ##
+      GO_ALV_INFO->INSERT_CELLCOLOR( EXPORTING IV_FIELDNAME = 'FLTYPE'
+                                               IV_COLOR     = '6'
+                                     CHANGING  CT_CELLCOLOR = LS_S0100-CELLCOLOR ).
+    ENDIF.
+
+    LS_S0100-CRUD = 'R'.
+
+    LS_S0100-BUTTON =   ICON_ENTER_MORE.
+    MODIFY GT_S0100 FROM LS_S0100 INDEX LV_IDX
+              TRANSPORTING  CARRNAME AIRPFROM_TXT  AIRPTO_TXT
+                            AIRPFROM_HDL  AIRPTO_HDL COUNTRYFR_TXT
+                            COUNTRYTO_TXT URL cellcolor BUTTON ICON CRUD .
+
+  ENDLOOP.
+
+  GT_S0100_TEMP[] = GT_S0100[].
+  GV_DBCNT = LINES( GT_S0100 ).
+  MESSAGE S010 WITH GV_DBCNT.   " & ## ## #####.
+
+
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*&      Form  SET_ALV_LAYOUT_0100
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM SET_ALV_LAYOUT_0100 .
+
+  CLEAR GS_LAYOUT_0100.
+  GS_LAYOUT_0100-ZEBRA      = 'X'.
+  GS_LAYOUT_0100-SEL_MODE   = 'A'.
+  GS_LAYOUT_0100-CWIDTH_OPT = 'X'.
+  GS_LAYOUT_0100-DETAILINIT = 'X'.  " #### #### ##
+*  gs_layout_0100-info_fname = 'LINECOLOR'.
+  gs_layout_0100-ctab_fname = 'CELLCOLOR'.
+  GS_LAYOUT_0100-STYLEFNAME = 'CELLTAB'.  "## EDITABLE/DISEDITABLE
+
+ENDFORM.                    " SET_ALV_LAYOUT_0100
+*&---------------------------------------------------------------------*
+*&      Form  SET_ALV_TOOLBAR_0100
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM SET_ALV_TOOLBAR_0100 .
+
+  GT_TOOL_0100 = GO_ALV_INFO->EXCLUDE_FUNCTIONS_DEFAULT( ).
+
+ENDFORM.                    " SET_ALV_TOOLBAR_0100
+*&---------------------------------------------------------------------*
+*&      Form  SET_ALV_VARIENT_0100
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM SET_ALV_VARIENT_0100 .
+
+  CLEAR: GS_VARI_0100.
+  GS_VARI_0100-REPORT   = GV_REPID.
+  GS_VARI_0100-HANDLE   = '0100'.
+  GS_VARI_0100-USERNAME = SY-UNAME.
+*  gs_vari_0100-variant  = p_vari.
+
+ENDFORM.                    " SET_ALV_VARIENT_0100
+*&---------------------------------------------------------------------*
+*&      Form  SET_ALV_FIELDCAT_0100
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM SET_ALV_FIELDCAT_0100 .
+
+* FIELDCATALOG ##
+  CLEAR: GT_FIELDCAT_0100[].
+  GT_FIELDCAT_0100[] = GO_ALV_INFO->GET_FIELDCATALOG( IT_TAB = GT_S0100[] ).
+
+*  #### FIELD ##, : ### #### ####.
+  CLEAR: GV_COL_POS.  " column ## ##..
+
+  %COM_ALV_COL_POS GT_FIELDCAT_0100:
+      'ICON'          'X' '04' TEXT-LST ' ' ' ' ' ', " ##
+      'CARRID'        'X' '03' TEXT-L01 ' ' ' ' ' ', "### ##
+      'CARRNAME'      'X' '20' TEXT-L02 ' ' ' ' ' ', "#####
+      'CONNID'        'X' '04' TEXT-L03 ' ' ' ' ' ', "### ## ##
+      'COUNTRYFR'     ' ' '03' TEXT-L04 ' ' ' ' ' ', "####/## #
+      'COUNTRYFR_TXT' ' ' '50' TEXT-L05 ' ' ' ' ' ', "####/## #
+      'CITYFROM'      ' ' '20' TEXT-L06 ' ' ' ' ' ', "## ##
+      'AIRPFROM'      ' ' '03' TEXT-L07 ' ' ' ' ' ', "## ##
+      'AIRPFROM_TXT'  ' ' '35' TEXT-L08 ' ' ' ' ' ', "## ###
+      'COUNTRYTO'     ' ' '03' TEXT-L09 ' ' ' ' ' ', "## ##/## #
+      'COUNTRYTO_TXT' ' ' '50' TEXT-L10 ' ' ' ' ' ', "## ##/## #
+      'CITYTO'        ' ' '20' TEXT-L11 ' ' ' ' ' ', "## ##
+      'AIRPTO'        ' ' '03' TEXT-L12 ' ' ' ' ' ', "## ##
+      'AIRPTO_TXT'    ' ' '35' TEXT-L13 ' ' ' ' ' ', "## ###
+      'FLTIME'        ' ' '10' TEXT-L14 ' ' ' ' ' ', "## ##
+      'DEPTIME'       ' ' '08' TEXT-L15 ' ' ' ' ' ', "####
+      'ARRTIME'       ' ' '08' TEXT-L16 ' ' ' ' ' ', "####
+      'DISTANCE'      ' ' '09' TEXT-L17 ' ' ' ' ' ', "##
+      'DISTID'        ' ' '03' TEXT-L18 ' ' ' ' ' ', "#### (kms, miles)
+      'FLTYPE'        ' ' '01' TEXT-L19 ' ' ' ' ' ', "### ##
+      'PERIOD'        ' ' '03' TEXT-L20 ' ' ' ' ' ', "n# # ##
+      'URL'           ' ' '255' TEXT-L21 'X' ' ' ' ', "### URL
+      'BUTTON'        ' ' '04' TEXT-L22  ' ' ' ' ' ', "##
+      'MESSAGE'       ' ' '30' TEXT-MSG  ' '  ' '  ' '.    " ###
+*## ##( &1 = _FIELDCATA# ,&2 = #### ,&3 = ##)
+  %COM_ALV_COL_QFIELD GT_FIELDCAT_0100:
+      'DISTID' 'DISTANCE'.
+
+* CURR# ### ## ###
+* %com_alv_col_currency
+
+* F4 ##
+  GO_ALV_INFO->COL_F4( EXPORTING IV_FIELDNAME = 'COUNTRYFR'
+                       CHANGING CT_FIELDCAT = GT_FIELDCAT_0100  ).
+
+  GO_ALV_INFO->COL_F4( EXPORTING IV_FIELDNAME = 'COUNTRYTO'
+                       CHANGING CT_FIELDCAT = GT_FIELDCAT_0100  ).
+
+* list-box ##
+
+
+  %COM_ALV_COL_DROPDN GT_FIELDCAT_0100:
+            'CARRNAME'  '100001'.
+
+  %COM_ALV_COL_DROPDN_ALIAS GT_FIELDCAT_0100:
+            'AIRPTO' 'AIRPTO_HDL'.
+
+  %COM_ALV_COL_DROPDN_ALIAS GT_FIELDCAT_0100:
+            'AIRPFROM' 'AIRPFROM_HDL'.
+
+*  GO_ALV_INFO->COL_DROPDN( EXPORTING IV_FIELDNAME = 'CARRNAME'
+*                                      IV_HANDLE = '100001'
+*                           CHANGING CT_FIELDCAT = GT_FIELDCAT_0100
+*                            ).
+*  GO_ALV_INFO->COL_DROPDN_ALIAS(  EXPORTING IV_FIELDNAME = 'AIRPTO'
+*                                            IV_ALIAS_FIELD = 'AIRPTO_HDL'
+*                                  CHANGING CT_FIELDCAT = GT_FIELDCAT_0100
+*                                   ).
+
+* #### ## FIELD ###
+  GO_ALV_INFO->COL_DELETE( CHANGING CT_FIELDCAT = GT_FIELDCAT_0100 ).
+
+
+
+ENDFORM.                    " SET_ALV_FIELDCAT_0100
+*&---------------------------------------------------------------------*
+*&      Form  SET_ALV_SORTCAT_0100
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM SET_ALV_SORTCAT_0100 .
+
+  CLEAR: GT_SORT_0100[].
+
+ENDFORM.                    " SET_ALV_SORTCAT_0100
+*&---------------------------------------------------------------------*
+*& Form LCA_F4_0100_COUNTRYFR
+*&---------------------------------------------------------------------*
+*    FIELDCATALOG# F4 ## ## ### LCA_F4_0100 =>  ####
+*& FIELDCATALOG# F4 ## ## ### LCA_F4_0100_ + FIELD NAME. => FIELD##
+*&---------------------------------------------------------------------*
+*## ##
+FORM LCA_F4_0100  TABLES   PT_APP_FIELD
+                            USING    P_FIELDNAME
+                                     PS_ROW_NO-ROW_ID
+                                     P_DISPLAY
+                            CHANGING PV_VALUE
+                                     PV_SELECTED
+                                     PV_MULTIPLE_CHOICE.
+
+*FIELD ##
+*FORM LCA_F4_0100_COUNTRYFR  TABLES   PT_APP_FIELD
+*                            USING    P_FIELDNAME
+*                                     PS_ROW_NO-ROW_ID
+*                                     P_DISPLAY
+*                            CHANGING PV_VALUE
+*                                     PV_SELECTED
+*                                     PV_MULTIPLE_CHOICE.
+
+
+  DATA : LS_MODIFIED TYPE LVC_S_MODI.
+
+  DATA: LT_F4 TYPE TABLE OF DDSHRETVAL,
+        LS_F4 TYPE DDSHRETVAL.
+
+  FIELD-SYMBOLS: <FT_F4> TYPE LVC_T_MODI.
+
+  CASE P_FIELDNAME.
+    WHEN 'COUNTRYFR'OR 'COUNTRYTO'. "S_CURRCODE
+      PERFORM F4_COUNTRYFR USING P_FIELDNAME
+                               PS_ROW_NO-ROW_ID
+                      CHANGING PV_VALUE
+                               PV_SELECTED.
+
+      IF P_DISPLAY IS NOT INITIAL.
+        CLEAR PV_SELECTED.
+      ENDIF.
+
+  ENDCASE.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form F4_COUNTRYFR
+*&---------------------------------------------------------------------*
+*& ### ##
+*&---------------------------------------------------------------------*
+FORM F4_COUNTRYFR  USING    P_FIELDNAME TYPE LVC_FNAME
+                            P_ROW_NO-ROW_ID TYPE INT4
+                   CHANGING PV_VALUE
+                            PV_SELECTED.
+
+
+  DATA(LV_TITLE) = '##/##'.
+
+  DATA:LT_RETURN_TAB TYPE DDSHRETVAL OCCURS 0,
+       LS_RETURN_TAB LIKE LINE OF LT_RETURN_TAB.
+
+  DATA: LV_RETFIELD    TYPE DFIES-FIELDNAME,
+        LV_DYNPROFIELD TYPE HELP_INFO-DYNPROFLD.
+
+*  2. INTERNAL TABLE# POSSIBLE ENTRY ###.
+  LV_RETFIELD = 'LAND1'.    "### ### # ##
+  LV_DYNPROFIELD = P_FIELDNAME.
+
+  CLEAR : LV_TITLE.
+
+  SELECT  LAND1,
+          LANDX,
+          LANDX50,
+          NATIO50
+  FROM T005T
+  WHERE SPRAS = @SY-LANGU
+  INTO TABLE @DATA(LT_T005T).
+
+
+  CALL FUNCTION 'F4IF_INT_TABLE_VALUE_REQUEST'
+    EXPORTING
+      RETFIELD        = LV_RETFIELD
+      DYNPPROG        = SY-REPID
+      DYNPNR          = SY-DYNNR
+      DYNPROFIELD     = LV_DYNPROFIELD
+      VALUE_ORG       = 'S'
+      WINDOW_TITLE    = LV_TITLE
+    TABLES
+      VALUE_TAB       = LT_T005T
+      RETURN_TAB      = LT_RETURN_TAB[]
+    EXCEPTIONS
+      PARAMETER_ERROR = 1
+      NO_VALUES_FOUND = 2
+      OTHERS          = 3.
+
+  CLEAR LS_RETURN_TAB.
+  READ TABLE LT_RETURN_TAB INTO LS_RETURN_TAB INDEX 1.
+
+  CHECK NOT LS_RETURN_TAB IS INITIAL.
+
+  PV_VALUE = LS_RETURN_TAB-FIELDVAL.
+
+*### ### ### #####  ## ##
+* # ALV FIELD# EDIT# ### ##~
+  PV_SELECTED = 'X'.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form set_fcode_0100
+*&---------------------------------------------------------------------*
+FORM SET_FCODE_0100 .
+  CLEAR: GT_FCODE.
+
+  "#### ### ####
+  IF GT_S0100[] IS INITIAL.
+    APPEND 'SAVE'  TO GT_FCODE.
+  ENDIF.
+
+  "### ### ## ####
+  IF GV_ACTION_FLAG_0100 = 'D'.
+    APPEND 'SAVE'  TO GT_FCODE.
+  ENDIF.
+
+  SORT GT_FCODE.
+  DELETE ADJACENT DUPLICATES FROM GT_FCODE
+         COMPARING ALL FIELDS.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form LCA_TOOLBAR_0100
+*&---------------------------------------------------------------------*
+* TOOLBAR ## ##
+*&---------------------------------------------------------------------*
+FORM LCA_TOOLBAR_0100 USING PV_DATA_SCR
+                 CHANGING E_OBJECT TYPE REF TO  CL_ALV_EVENT_TOOLBAR_SET.
+
+  DATA: LS_TOOLBAR TYPE STB_BUTTON.
+
+  DATA(LV_INDEX) = 1.
+
+  GO_ALV_INFO->ADD_BUTTON( EXPORTING IV_COMMAND = 'APPEND'
+                                           IV_ICON = ICON_INSERT_ROW
+                                           IV_TEXT = TEXT-B01
+                                           IV_QUICK = TEXT-B01
+                                CHANGING  CV_INDEX = LV_INDEX
+                                          CO_OBJECT = E_OBJECT ).
+*  LV_INDEX = LV_INDEX + 1.
+
+  GO_ALV_INFO->ADD_BUTTON( EXPORTING IV_COMMAND = 'DELETE'
+                                           IV_ICON = ICON_DELETE_ROW
+                                           IV_TEXT = TEXT-B02
+                                           IV_QUICK = TEXT-B02
+                                CHANGING  CV_INDEX = LV_INDEX
+                                          CO_OBJECT = E_OBJECT ).
+
+*drop list# ### ### butn_type = 2 # #####, ## ## ### ####. (=drop list ##)
+
+*0  ##(##)
+*1  ## # ## ##
+*2  ##
+*3  ###
+*4  ### ##
+*5  ####
+*6  ## ##
+  GO_ALV_INFO->ADD_BUTTON( EXPORTING  IV_BUTN_TYPE  = '2'
+                                        IV_COMMAND = 'BTN_LIST'
+                                           IV_ICON = ICON_DROPDOWNLIST
+                                           IV_TEXT = TEXT-B03
+                                           IV_QUICK = TEXT-B03
+                                CHANGING  CV_INDEX = LV_INDEX
+                                          CO_OBJECT = E_OBJECT ).
+
+
+
+**    CLEAR ls_toolbar.
+*    ls_toolbar-function  = 'APPEND'.
+*    ls_toolbar-icon      = icon_insert_row.
+*    ls_toolbar-text      = text-b01. "'###'.
+*    ls_toolbar-quickinfo = text-b01. "'###'.
+*    INSERT ls_toolbar INTO e_object->mt_toolbar INDEX 1.
+*
+** ###
+*    CLEAR ls_toolbar.
+*    ls_toolbar-function  = 'DELETE'.
+*    ls_toolbar-icon      = icon_delete_row.
+*    ls_toolbar-text      = text-b02. "'###'.
+*    ls_toolbar-quickinfo = text-b02. "'###'.
+*    INSERT ls_toolbar INTO e_object->mt_toolbar INDEX 2.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form LCA_UB_0100
+*&---------------------------------------------------------------------*
+* TOOLBAR ## ### USER_COMMAND
+*&---------------------------------------------------------------------*
+FORM LCA_UB_0100 USING P_UCOMM LIKE SY-UCOMM.
+
+
+  CASE P_UCOMM.
+    WHEN 'APPEND'.
+      PERFORM ALV_INSERT_ROW.
+    WHEN 'DELETE'.
+      PERFORM ALV_DELETE_ROW.
+    WHEN  'A' OR 'B' OR 'C'. "TOOLBAR MENU DORPDOWN
+*      PERFORM ALV_MENU_DROP_DOWN
+  ENDCASE.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form alv_insert_row
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM ALV_INSERT_ROW .
+
+  DATA: LS_EDIT TYPE LVC_S_STYL,
+        LT_EDIT TYPE LVC_T_STYL.
+
+  DATA : LS_S0100 TYPE TYS_S0100.
+
+  DATA(LV_STYLE) = 'E'.
+  DATA : LV_FIELDNAME TYPE FIELDNAME.
+
+  LS_S0100-ICON =  ICON_YELLOW_LIGHT.
+  LV_FIELDNAME = 'CARRID'.
+*  GO_ALV_INFO->INSERT_CELLTAB( EXPORTING IV_STYLE = 'E' "LV_STYLE
+*                                         IV_FIELDNAME = 'CARRID'
+*                               CHANGING
+*                                 CT_CELLTAB = LT_EDIT ).
+
+  GO_ALV_INFO->INSERT_CELLTAB( EXPORTING IV_STYLE = 'E' "LV_STYLE
+                                         IV_FIELDNAME = 'CARRNAME'
+                               CHANGING
+                                 CT_CELLTAB = LT_EDIT ).
+
+  GO_ALV_INFO->INSERT_CELLTAB( EXPORTING IV_STYLE = 'E' "LV_STYLE
+                                         IV_FIELDNAME = 'CONNID'
+*                                         IT_CELLTAB = LT_EDIT
+                               CHANGING
+                                 CT_CELLTAB = LT_EDIT ).
+
+*  GO_ALV_INFO->INSERT_CELLTAB( EXPORTING IV_STYLE = 'E' "LV_STYLE
+*                                         IV_FIELDNAME = 'AIRPFROM'
+**                                         IT_CELLTAB = LT_EDIT
+*                               CHANGING
+*                                 CT_CELLTAB = LT_EDIT ).
+
+  GO_ALV_INFO->INSERT_CELLTAB( EXPORTING IV_STYLE = 'E' "LV_STYLE
+                                         IV_FIELDNAME = 'COUNTRYFR'
+*                                         IT_CELLTAB = LT_EDIT
+                               CHANGING
+                                 CT_CELLTAB = LT_EDIT ).
+
+  GO_ALV_INFO->INSERT_CELLTAB( EXPORTING IV_STYLE = 'E' "LV_STYLE
+                                         IV_FIELDNAME = 'COUNTRYTO'
+*                                         IT_CELLTAB = LT_EDIT
+                               CHANGING
+                                 CT_CELLTAB = LT_EDIT ).
+
+*
+*  GO_ALV_INFO->INSERT_CELLTAB( EXPORTING IV_STYLE = 'E' "LV_STYLE
+*                                         IV_FIELDNAME = 'AIRPTO'
+**                                         IT_CELLTAB = LT_EDIT
+*                               CHANGING
+*                                 CT_CELLTAB = LT_EDIT ).
+
+
+**### ID
+*  PERFORM cell_tab USING 'CARRID' 'E'
+*                 CHANGING lt_edit.
+**###NO
+*  PERFORM cell_tab USING 'CONNID' 'E'
+*                              CHANGING lt_edit.
+**   #####
+*  PERFORM cell_tab USING 'COUNTRYFR' 'E'
+*                              CHANGING lt_edit.
+**   #####
+*  PERFORM cell_tab USING 'COUNTRYTO' 'E'
+*                              CHANGING lt_edit.
+
+  LS_S0100-CELLTAB  = LT_EDIT.
+  LS_S0100-CRUD = 'C'.
+  APPEND LS_S0100 TO GT_S0100.
+  APPEND LS_S0100 TO GT_S0100_TEMP.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form alv_delete_row
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM ALV_DELETE_ROW .
+
+  DATA : LT_ROWS TYPE LVC_T_ROW.
+*          ls_rows TYPE lvc_s_row.
+*
+
+  " ## ## ###
+  CHECK GO_COMFUNC->CHECK_MESSAGE( IV_MSG = 'D1' ) = 'X'.
+
+  CALL METHOD GO_GRID_0100->GET_SELECTED_ROWS
+    IMPORTING
+      ET_INDEX_ROWS = LT_ROWS.
+  "alv## ### ### it_rows# ####.
+  DESCRIBE TABLE LT_ROWS LINES SY-TFILL.
+
+  IF SY-TFILL = 0.
+    MESSAGE I000 WITH '### #####'.
+    EXIT.
+  ELSE.
+    LOOP AT LT_ROWS INTO DATA(LS_ROWS).
+      READ TABLE GT_S0100 INTO DATA(LS_S0100)
+                       INDEX LS_ROWS-INDEX.
+      IF SY-SUBRC = 0.
+        LS_S0100-CRUD = 'D'.
+        MODIFY GT_S0100 FROM LS_S0100 INDEX LS_ROWS-INDEX
+              TRANSPORTING CRUD.
+* #### DB #### ###
+        IF LS_S0100-ICON = ICON_GREEN_LIGHT.
+          READ TABLE GT_S0100_DEL INTO DATA(LS_S0100_DEL)
+                           WITH KEY CARRID = LS_S0100-CARRID
+                                    CONNID = LS_S0100-CONNID .
+          IF SY-SUBRC NE 0.
+            GT_S0100_DEL = VALUE #( ( CARRID = LS_S0100-CARRID
+                         CONNID = LS_S0100-CONNID ) ).
+
+          ENDIF.
+
+        ENDIF.
+
+      ENDIF.
+
+      READ TABLE GT_S0100_TEMP INTO DATA(LS_S0100_TEMP)
+                       INDEX LS_ROWS-INDEX.
+      IF SY-SUBRC = 0.
+        LS_S0100_TEMP-CRUD = 'D'.
+        MODIFY GT_S0100_TEMP FROM LS_S0100_TEMP
+                      INDEX LS_ROWS-INDEX
+              TRANSPORTING CRUD.
+      ENDIF.
+
+    ENDLOOP.
+  ENDIF.
+
+
+  DELETE GT_S0100 WHERE CRUD = 'D'.
+  DELETE GT_S0100_TEMP WHERE CRUD = 'D'.
+
+
+  " ### ## ## #### ####
+  IF LINE_EXISTS( GT_S0100[ ICON = ICON_RED_LIGHT ] ).
+    GV_ACTION_FLAG_0100 = 'D'.
+  ELSE.
+    GV_ACTION_FLAG_0100 = 'A'.
+  ENDIF.
+
+* PAI ## ## ##(USER_COMMOND) PBO#
+*#### #### ##
+  CALL METHOD CL_GUI_CFW=>SET_NEW_OK_CODE
+    EXPORTING
+      NEW_CODE = 'ENTER'.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SET_ALV_TOPPAGE_0100
+*&---------------------------------------------------------------------*
+FORM SET_ALV_TOPPAGE_0100 USING
+               PV_DYNNR    TYPE SY-DYNNR
+              E_DYNDOC_ID TYPE REF TO CL_DD_DOCUMENT.
+
+
+  IF E_DYNDOC_ID IS INITIAL.
+    CREATE OBJECT E_DYNDOC_ID
+      EXPORTING
+        STYLE = 'ALV_GRID'.
+  ENDIF.
+*--------------------------------------------------------------------
+* #### ### #### ##
+* #### ## ### ### ####
+* FORM ADD_ALV_TOPPAGE_0100(ADD_ALV_TOPPAGE_ + ##) # #### #.
+*  go_alv_info->set_header_show( EXPORTING iv_dynnr = pv_dynnr
+*                                CHANGING  co_docu  = go_docu_0100
+*                                          co_head  = go_head_0100
+*                                          co_html  = go_html_0100 ).
+*--------------------------------------------------------------------
+
+*  DATA LV_TEXT       TYPE CHAR255.
+**
+*  CLEAR : LV_TEXT.
+*  CONCATENATE  '###ID:' P_CARRID     INTO LV_TEXT
+*      SEPARATED  BY SPACE.
+**  lv_text = 'TITLE TEST'.
+*  CALL METHOD E_DYNDOC_ID->ADD_TEXT
+*    EXPORTING
+*      TEXT = LV_TEXT.
+*
+**      sap_fontstyle = e_dyndoc_id->large
+**      sap_emphasis  = e_dyndoc_id->strong.
+*
+*  CALL METHOD E_DYNDOC_ID->NEW_LINE( ).
+*
+*  CLEAR : LV_TEXT.
+*  CONCATENATE  '###No:' S_CONNID-LOW   INTO LV_TEXT
+*      SEPARATED  BY SPACE.
+**  lv_text = 'TITLE TEST'.
+*  CALL METHOD E_DYNDOC_ID->ADD_TEXT
+*    EXPORTING
+*      TEXT = LV_TEXT.
+**      sap_fontstyle = e_dyndoc_id->large
+**      sap_emphasis  = e_dyndoc_id->strong.
+*
+*  CALL METHOD E_DYNDOC_ID->NEW_LINE( ).
+
+*  " Background Image ##
+*  CALL METHOD GO_DOCU_0100->SET_DOCUMENT_BACKGROUND
+*    EXPORTING
+*      PICTURE_ID = 'ALV_BACKGROUND'.
+
+
+  TYPES: BEGIN OF TAB_TEXT,
+           TEXT TYPE SDYDO_TEXT_ELEMENT,
+         END OF TAB_TEXT.
+  DATA: S_TAB  TYPE SDYDO_TEXT_TABLE.
+  DATA: TEXT TYPE SDYDO_TEXT_ELEMENT.
+  DATA: I_TEXT TYPE TABLE OF TAB_TEXT.
+  DATA: W_TEXT TYPE TAB_TEXT.
+  DATA: A_LOGO TYPE REF TO CL_DD_AREA.
+  DATA: DATE1(10).
+
+*  CALL METHOD E_DYNDOC_ID->INITIALIZE_DOCUMENT.
+
+**  this should be a graphic stored in BDS
+*  CALL METHOD E_DYNDOC_ID->SET_DOCUMENT_BACKGROUND
+*    EXPORTING
+*      PICTURE_ID = 'SmWhiteSquare'.
+
+** split TOP-Document to make space for the logo on the right
+  CALL METHOD E_DYNDOC_ID->VERTICAL_SPLIT
+    EXPORTING
+      SPLIT_AREA  = E_DYNDOC_ID
+      SPLIT_WIDTH = '70%'
+    IMPORTING
+      RIGHT_AREA  = A_LOGO.
+
+  DATE1 =  SY-DATUM(4) && '/' && SY-DATUM+6(2) && '/' &&  SY-DATUM+6(2).
+
+*  CONCATENATE SY-DATUM+4(2) ' / ' SY-DATUM+6(2) ' / '  SY-DATUM(4)
+*  INTO DATE1.
+  CONCATENATE 'DATE'  DATE1 INTO W_TEXT-TEXT
+                                SEPARATED BY ':'.
+
+  APPEND W_TEXT TO I_TEXT.
+
+  CONCATENATE 'time:' SY-UZEIT INTO W_TEXT .
+  APPEND W_TEXT TO I_TEXT.
+  CONCATENATE 'uesr:' SY-UNAME INTO W_TEXT .
+  APPEND W_TEXT TO I_TEXT.
+  CONCATENATE 'local date:' SY-DATLO INTO W_TEXT .
+  APPEND W_TEXT TO I_TEXT.
+  CONCATENATE 'time zone:' SY-ZONLO INTO W_TEXT .
+  APPEND W_TEXT TO I_TEXT.
+  S_TAB[] = I_TEXT[].
+
+  CALL METHOD A_LOGO->ADD_TEXT
+    EXPORTING
+      TEXT_TABLE   = S_TAB
+      FIX_LINES    = 'X'
+      SAP_FONTSIZE = CL_DD_DOCUMENT=>MEDIUM
+      SAP_EMPHASIS = CL_DD_DOCUMENT=>STRONG.
+
+** and add a Company logo - stored in BDS as above
+  CALL METHOD A_LOGO->ADD_PICTURE
+    EXPORTING
+      PICTURE_ID = 'ALV_BACKGROUND'. " 'YourLogoHere'.
+
+* ### #### TEXT ### ##
+  CALL METHOD E_DYNDOC_ID->ADD_GAP
+    EXPORTING
+      WIDTH = 60.
+
+
+** fill TOP-Document space on the left with data
+* first the title
+  TEXT = SY-REPID.   " 'Var with My report name'.
+  CALL METHOD E_DYNDOC_ID->ADD_TEXT
+    EXPORTING
+      TEXT      = TEXT
+*     SAP_FONTSIZE = CL_DD_DOCUMENT=>MEDIUM
+      SAP_STYLE = 'HEADING'.
+*      SAP_EMPHASIS = 'STRONG'.
+  CALL METHOD E_DYNDOC_ID->NEW_LINE.
+
+
+* row ## Data # Table # ####.
+* ### ## VERTICAL_SPLIT # ####.
+* ## ### ##(EX) DATE,TIME,USER...
+  CALL METHOD GO_DOCU_0100->MERGE_DOCUMENT.
+
+*    " HTML ### ####.
+*  go_docu_0100->html_control = go_html_0100 .
+
+
+  CALL METHOD E_DYNDOC_ID->DISPLAY_DOCUMENT
+    EXPORTING
+      PARENT        = GO_HEAD_0100
+      REUSE_CONTROL = 'X'.
+
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SET_ALV_TOPOFPAGE_0100
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SET_ALV_TOPOFPAGE_0100 .
+
+*     processing events.
+  GO_ALV_INFO->CALL_EVENT( IO_GRID  = GO_GRID_0100
+                           IO_DOCU  = GO_DOCU_0100
+                           IV_EVENT = GC_EVENT_TOP_OF_PAGE ).
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SET_ALV_f4_0100
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SET_ALV_F4_0100 .
+  DATA: LT_F4 TYPE LVC_T_F4.
+
+
+  LT_F4 = GO_ALV_INFO->ADD_F4_FIELD( EXPORTING IV_FIELDNAME = 'COUNTRYFR'
+                                      IV_CHNGEAFTER = 'X'
+                                    ).
+
+  GO_GRID_0100->REGISTER_F4_FOR_FIELDS( EXPORTING IT_F4 = LT_F4 ).
+
+  LT_F4 = GO_ALV_INFO->ADD_F4_FIELD( EXPORTING IV_FIELDNAME = 'COUNTRYTO'
+                                      IV_CHNGEAFTER = 'X'
+                                    ).
+  GO_GRID_0100->REGISTER_F4_FOR_FIELDS( EXPORTING IT_F4 = LT_F4 ).
+
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form F4_CARRID
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> P_
+*&---------------------------------------------------------------------*
+FORM F4_CARRID  USING  PV_OUT_FIELD.
+
+*DATA : LS_F4_INFO TYPE ZJIK_TEMP_F4_INFOS.
+
+  DATA(LS_F4_INFO) = VALUE ZJIK_TEMP_F4_INFOS( REPID = GV_REPID
+                       DYNNR = SY-DYNNR
+                       TABNAME = 'SCARR'
+                       FIELDNAME = 'CARRID'
+                       SHLPNAME = 'S_CARRIER_ID'
+                       SHLPFIELD = 'CARRID' ).
+*
+*LS_F4_INFO-REPID = GV_REPID.
+*LS_F4_INFO-DYNNR = SY-DYNNR.
+*LS_F4_INFO-TABNAME = 'SCARR'.
+*LS_F4_INFO-FIELDNAME = 'CARRID'.
+*LS_F4_INFO-SHLPNAME = 'S_CARRIER_ID'.
+*LS_F4_INFO-SHLPFIELD = 'CARRID'.
+
+*LS_F4_INFO-FIELDS =
+
+  GO_COMFUNC->F4_FIELD_VALUE_REQUEST( CHANGING CS_F4_INFO = LS_F4_INFO ).
+
+  ASSIGN (PV_OUT_FIELD) TO FIELD-SYMBOL(<LV_FIELD>).
+
+  CHECK <LV_FIELD> IS ASSIGNED.
+
+  <LV_FIELD> = LS_F4_INFO-SELECTED_VALUE.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form F4_CONNID
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> P_
+*&---------------------------------------------------------------------*
+FORM F4_AIRPFR  USING  PV_OUT_FIELD.
+
+  DATA : LS_F4_VALUE TYPE ZJIK_TEMP_F4_VALUES,
+         LT_F4_VALUE TYPE ZJIK_TEMP_F4_VALUEY,
+         LS_F4_FIELD TYPE ZJIK_TEMP_F4_FIELDS,
+         LT_F4_FIELD TYPE ZJIK_TEMP_F4_FIELDY.
+
+  DATA : LS_DYNPFIELD  TYPE DYNPREAD,
+         LT_DYNPFIELDS TYPE TABLE OF DYNPREAD.
+
+
+  DATA(LS_F4_INFO) = VALUE ZJIK_TEMP_F4_INFOS( REPID = GV_REPID
+                       DYNNR = SY-DYNNR
+                       TABNAME = 'SAIRPORT'
+                       FIELDNAME = 'ID'
+                       SHLPNAME = 'SCITAIRP'
+                       SHLPFIELD = 'AIRPORT'
+                       MULTIPLE_CHOICE = 'X' ).
+
+*### ## FIELD# ### ## ## #
+  LS_F4_FIELD-SCR_FIELD = PV_OUT_FIELD.
+  LS_F4_FIELD-SHLP_FIELD = 'AIRPORT'.
+  LS_F4_FIELD-ACTION = 'U'.
+  INSERT  LS_F4_FIELD INTO TABLE LS_F4_INFO-FIELDS.
+
+  GO_COMFUNC->F4_FIELD_VALUE_REQUEST( CHANGING CS_F4_INFO = LS_F4_INFO ).
+
+*### ##### # #### ##
+  IF LS_F4_INFO-MULTIPLE_CHOICE IS NOT INITIAL.
+    LT_F4_VALUE[] = LS_F4_INFO-VALUES[].
+    LOOP AT LT_F4_VALUE INTO LS_F4_VALUE.
+      SET_RANGES : S_AIRPFR 'I' 'EQ'LS_F4_VALUE-VALUE ' '.
+    ENDLOOP.
+*  ELSE.
+*    ASSIGN (PV_OUT_FIELD) TO FIELD-SYMBOL(<LV_FIELD>).
+*
+*    CHECK <LV_FIELD> IS ASSIGNED.
+*
+*    <LV_FIELD> = LS_F4_INFO-SELECTED_VALUE.
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form LCA_DP_0100
+*&---------------------------------------------------------------------*
+*& DROPDOWN ##
+*&---------------------------------------------------------------------*
+FORM LCA_DP_0100 TABLES PT_DROPDOWN
+                 USING  PV_DRAGDROPOBJ
+                        PV_ROW_NO
+                        PV_COLUMN-FIELDNAME.
+
+  DATA: LT_DROPDOWN TYPE LVC_T_DRAL,
+        LS_DROPDOWN TYPE LVC_S_DRAL.
+
+  SELECT A~CARRID, "### ##
+        A~CARRNAME "#####
+ FROM SCARR AS A INNER JOIN
+       @GT_S0100 AS B
+      ON A~CARRID = B~CARRID
+ INTO TABLE @DATA(LT_SCARR).
+
+  LOOP AT LT_SCARR INTO DATA(LS_SCARR).
+    LS_DROPDOWN-HANDLE = '1'.
+    LS_DROPDOWN-INT_VALUE = LS_SCARR-CARRID.
+    LS_DROPDOWN-VALUE   =  LS_SCARR-CARRNAME .
+*    ls_dropdown-value       =
+    APPEND  LS_DROPDOWN TO LT_DROPDOWN.
+    CLEAR  LS_DROPDOWN.
+
+  ENDLOOP.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SET_ALV_CELLTAB_0100
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+FORM SET_ALV_CELLTAB_0100 .
+
+  DATA: LT_EDIT TYPE LVC_T_STYL.
+
+  LOOP AT GT_S0100 INTO DATA(LS_S0100).
+    DATA(LV_TABIX) = SY-TABIX.
+
+    %COM_ALV_SET_CELLTAB LT_EDIT 'B' 'BUTTON'.
+
+*    GO_ALV_INFO->INSERT_CELLTAB( EXPORTING IV_STYLE = 'D' "LV_STYLE
+*                                           IV_FIELDNAME = 'CARRNAME'
+*                                 CHANGING
+*                                   CT_CELLTAB = LT_EDIT ).
+
+*    IF LS_S0100-CARRID IS NOT INITIAL AND
+*       LS_S0100-CONNID IS NOT INITIAL.
+*
+*      GO_ALV_INFO->INSERT_CELLTAB( EXPORTING IV_STYLE = 'D' "LV_STYLE
+*                                             IV_FIELDNAME = 'CARRID'
+*                                   CHANGING
+*                                     CT_CELLTAB = LT_EDIT ).
+*
+*      GO_ALV_INFO->INSERT_CELLTAB( EXPORTING IV_STYLE = 'D' "LV_STYLE
+*                                             IV_FIELDNAME = 'CONNID'
+*                                   CHANGING
+*                                     CT_CELLTAB = LT_EDIT ).
+*
+*    ENDIF.
+
+    LS_S0100-CELLTAB  = LT_EDIT.
+
+    MODIFY GT_S0100 FROM LS_S0100 INDEX LV_TABIX
+                    TRANSPORTING CELLTAB.
+    CLEAR : LT_EDIT.
+  ENDLOOP.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  LCA_CH_0100_CARRNAME
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM LCA_CH_0100_CARRNAME            "
+     USING    PO_DATA_CHANGED TYPE REF TO CL_ALV_CHANGED_DATA_PROTOCOL
+              PS_MODI_CELL    TYPE LVC_S_MODI
+              PV_DYNNR
+     CHANGING PS_WORK         TYPE TYS_S0100
+              PT_MOD_TAB      TYPE ZJIKCL_TEMP_ALV_EVENT=>TYT_MOD_TAB.
+
+  DATA: LS_DROPDOWN  TYPE LVC_S_DRAL.
+  READ TABLE GT_DROPDOWN INTO LS_DROPDOWN WITH KEY HANDLE = '100001'
+                                                   VALUE  = PS_MODI_CELL-VALUE
+       BINARY SEARCH.
+  CHECK SY-SUBRC = 0.
+
+  PS_WORK-CARRID = LS_DROPDOWN-INT_VALUE.
+
+  SELECT SINGLE URL
+         FROM SCARR
+         WHERE CARRID = @PS_WORK-CARRID
+         INTO @PS_WORK-URL.
+
+  MODIFY GT_S0100 FROM PS_WORK INDEX PS_MODI_CELL-ROW_ID
+         TRANSPORTING CARRID URL.
+
+ENDFORM.                    "LCA_CH_0100_CARRNAME
+*&---------------------------------------------------------------------*
+*&      Form  LCA_CH_0100_COUNTRYFR
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM LCA_CH_0100_COUNTRYFR
+       USING    PO_DATA_CHANGED TYPE REF TO CL_ALV_CHANGED_DATA_PROTOCOL
+              PS_MODI_CELL    TYPE LVC_S_MODI
+              PV_DYNNR
+     CHANGING PS_WORK         TYPE TYS_S0100
+              PT_MOD_TAB      TYPE ZJIKCL_TEMP_ALV_EVENT=>TYT_MOD_TAB.
+
+  DATA : LT_EDIT TYPE LVC_T_STYL.
+  CLEAR :  PS_WORK-COUNTRYFR_TXT.
+  SELECT SINGLE LANDX50 INTO  PS_WORK-COUNTRYFR_TXT
+      FROM T005T
+      WHERE SPRAS = SY-LANGU
+       AND LAND1 = PS_MODI_CELL-VALUE.
+
+  IF PS_WORK-COUNTRYFR_TXT IS INITIAL.
+    PS_WORK-ICON = ICON_RED_LIGHT.
+    PS_WORK-MESSAGE = '## ### ###.'.
+    PS_WORK-ENUMBER = 1.
+  ELSE.
+    IF PS_WORK-ENUMBER = 1.
+      PS_WORK-ICON = ICON_YELLOW_LIGHT.
+      CLEAR : PS_WORK-MESSAGE ,PS_WORK-ENUMBER.
+    ENDIF.
+  ENDIF.
+
+
+  FIND FIRST OCCURRENCE OF PS_MODI_CELL-VALUE+0(1) IN SY-ABCDE
+      IN CHARACTER MODE MATCH OFFSET DATA(LV_OFFSET1).
+
+  FIND FIRST OCCURRENCE OF PS_MODI_CELL-VALUE+1(2) IN SY-ABCDE
+     IN CHARACTER MODE MATCH OFFSET DATA(LV_OFFSET2).
+
+  DATA(LV_OFFSET) = LV_OFFSET1 && LV_OFFSET2.
+
+  PS_WORK-AIRPFROM_HDL =  100100 + LV_OFFSET.
+
+*  LT_EDIT = PS_WORK-CELLTAB.
+
+  %COM_ALV_SET_CELLTAB PS_WORK-CELLTAB  'E' 'AIRPFROM'.
+
+* CELLTAB# CELLCOLOR# ##### PT_MOD_TAB# #####.
+*    BEGIN OF TYS_MOD_TAB,
+*        INDEX     TYPE LVC_S_MODI-ROW_ID,
+*        UPT_TAB   TYPE CHAR1,
+*        UPT_COLOR TYPE CHAR1,
+*        CELLTAB   TYPE LVC_T_STYL,      " CHANGE THE PROPERTIES OF A FIELD
+*        CELLCOLOR TYPE LVC_T_SCOL,      " CTAB_FNAME [ LVC_T_SCOL ]
+*      END OF TYS_MOD_TAB .
+
+  PT_MOD_TAB = VALUE #( ( UPT_TAB = 'X'
+                          INDEX =  PS_MODI_CELL-ROW_ID
+                           CELLTAB = PS_WORK-CELLTAB ) ).
+
+  MODIFY GT_S0100 FROM PS_WORK INDEX PS_MODI_CELL-ROW_ID
+         TRANSPORTING COUNTRYFR_TXT AIRPFROM_HDL
+                      ICON ENUMBER  MESSAGE.
+
+
+ENDFORM.                    "LCA_CH_0100_COUNTRYFR
+*&---------------------------------------------------------------------*
+*&      Form  LCA_CH_0100_COUNTRYTO
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM LCA_CH_0100_COUNTRYTO
+       USING    PO_DATA_CHANGED TYPE REF TO CL_ALV_CHANGED_DATA_PROTOCOL
+              PS_MODI_CELL    TYPE LVC_S_MODI
+              PV_DYNNR
+     CHANGING PS_WORK         TYPE TYS_S0100
+              PT_MOD_TAB      TYPE ZJIKCL_TEMP_ALV_EVENT=>TYT_MOD_TAB.
+
+  TRANSLATE PS_MODI_CELL-VALUE TO UPPER CASE.
+  CLEAR :  PS_WORK-COUNTRYTO_TXT.
+  SELECT SINGLE LANDX50 INTO  PS_WORK-COUNTRYTO_TXT
+      FROM T005T
+      WHERE SPRAS = SY-LANGU
+       AND LAND1 = PS_MODI_CELL-VALUE.
+
+  IF PS_WORK-COUNTRYTO_TXT IS INITIAL.
+    PS_WORK-ICON = ICON_RED_LIGHT.
+    PS_WORK-MESSAGE = '## ### ###.'.
+    PS_WORK-ENUMBER = 2.
+  ELSE.
+    IF PS_WORK-ENUMBER = 2.
+      PS_WORK-ICON = ICON_YELLOW_LIGHT.
+      CLEAR : PS_WORK-MESSAGE ,PS_WORK-ENUMBER.
+    ENDIF.
+  ENDIF.
+
+
+  FIND FIRST OCCURRENCE OF PS_MODI_CELL-VALUE+0(1) IN SY-ABCDE
+      IN CHARACTER MODE MATCH OFFSET DATA(LV_OFFSET1).
+
+  FIND FIRST OCCURRENCE OF PS_MODI_CELL-VALUE+1(2) IN SY-ABCDE
+     IN CHARACTER MODE MATCH OFFSET DATA(LV_OFFSET2).
+
+  DATA(LV_OFFSET) = LV_OFFSET1 && LV_OFFSET2.
+
+  PS_WORK-AIRPTO_HDL =  100100 + LV_OFFSET.
+
+
+  %COM_ALV_SET_CELLTAB PS_WORK-CELLTAB  'E' 'AIRPTO'.
+
+  PT_MOD_TAB = VALUE #( ( UPT_TAB = 'X'
+                          INDEX =  PS_MODI_CELL-ROW_ID
+                           CELLTAB = PS_WORK-CELLTAB ) ).
+
+
+*  PS_WORK-COUNTRYFR_TXT = LS_DROPDOWN-INT_VALUE.
+  MODIFY GT_S0100 FROM PS_WORK INDEX PS_MODI_CELL-ROW_ID
+         TRANSPORTING COUNTRYTO_TXT AIRPTO_HDL
+                      ICON ENUMBER MESSAGE.
+
+ENDFORM.                    "LCA_CH_0100_COUNTRYTO
+*&---------------------------------------------------------------------*
+*&      Form  LCA_CH_0100_AIRPFROM
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM LCA_CH_0100_AIRPFROM
+   USING    PO_DATA_CHANGED TYPE REF TO CL_ALV_CHANGED_DATA_PROTOCOL
+              PS_MODI_CELL    TYPE LVC_S_MODI
+              PV_DYNNR
+     CHANGING PS_WORK         TYPE TYS_S0100
+              PT_MOD_TAB      TYPE ZJIKCL_TEMP_ALV_EVENT=>TYT_MOD_TAB.
+
+*#####
+  READ TABLE GT_SAIRPORT INTO DATA(LS_SAIRPORT)
+                          WITH KEY ID = PS_MODI_CELL-VALUE.
+
+  IF SY-SUBRC =  0.
+    PS_WORK-AIRPFROM_TXT = LS_SAIRPORT-NAME.
+  ENDIF.
+
+*## ##
+  SELECT SINGLE MASTERCITY
+     FROM SCITAIRP
+     WHERE AIRPORT = @PS_MODI_CELL-VALUE
+    INTO @PS_WORK-CITYFROM.
+
+  MODIFY GT_S0100 FROM PS_WORK INDEX PS_MODI_CELL-ROW_ID
+         TRANSPORTING AIRPFROM_TXT CITYFROM.
+
+ENDFORM.                    "LCA_CH_0100_AIRPFROM
+*&---------------------------------------------------------------------*
+*&      Form  LCA_CH_0100_AIRPTO
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM LCA_CH_0100_AIRPTO
+   USING    PO_DATA_CHANGED TYPE REF TO CL_ALV_CHANGED_DATA_PROTOCOL
+              PS_MODI_CELL    TYPE LVC_S_MODI
+              PV_DYNNR
+     CHANGING PS_WORK         TYPE TYS_S0100
+              PT_MOD_TAB      TYPE ZJIKCL_TEMP_ALV_EVENT=>TYT_MOD_TAB.
+
+*#####
+  READ TABLE GT_SAIRPORT INTO DATA(LS_SAIRPORT)
+                          WITH KEY ID = PS_MODI_CELL-VALUE.
+
+  IF SY-SUBRC =  0.
+    PS_WORK-AIRPTO_TXT = LS_SAIRPORT-NAME.
+  ENDIF.
+
+*## ##
+  SELECT SINGLE MASTERCITY
+     FROM SCITAIRP
+     WHERE AIRPORT = @PS_MODI_CELL-VALUE
+    INTO @PS_WORK-CITYTO.
+
+  MODIFY GT_S0100 FROM PS_WORK INDEX PS_MODI_CELL-ROW_ID
+         TRANSPORTING AIRPTO_TXT CITYTO.
+
+ENDFORM.                    "LCA_CH_0100_AIRPTO
+*&---------------------------------------------------------------------*
+*& Form LCA_CF_0100
+*&---------------------------------------------------------------------*
+*& CHANGED_finished
+*&---------------------------------------------------------------------*
+FORM LCA_CF_0100  USING ET_GOOD_CELLS TYPE LVC_T_MODI.
+
+  LOOP AT ET_GOOD_CELLS  INTO DATA(LS_GOOD_CELLS).
+
+    READ TABLE GT_S0100 INTO  GS_S0100
+                        INDEX LS_GOOD_CELLS-ROW_ID.
+
+    IF LINE_EXISTS( GT_S0100_TEMP[ LS_GOOD_CELLS-ROW_ID ]
+                                 ).
+
+      DELETE GT_S0100_TEMP INDEX LS_GOOD_CELLS-ROW_ID.
+    ENDIF.
+
+    IF LINE_EXISTS( GT_S0100_TEMP[ CARRID = GS_S0100-CARRID
+                                   CONNID = GS_S0100-CONNID
+                                   ]
+                                  ).
+
+      GS_S0100-MESSAGE = '## ######.'.
+      GS_S0100-ICON = ICON_RED_LIGHT.
+      GS_S0100-CRUD = 'D'.
+
+
+      GO_ALV_INFO->INSERT_CELLTAB( EXPORTING IV_STYLE = 'D' "LV_STYLE
+                                         IV_FIELDNAME = 'CARRID'
+                               CHANGING
+                                 CT_CELLTAB = GT_CELLTAB ).
+
+      GO_ALV_INFO->INSERT_CELLTAB( EXPORTING IV_STYLE = 'D' "LV_STYLE
+                                         IV_FIELDNAME = 'CONNID'
+                               CHANGING
+                                 CT_CELLTAB = GT_CELLTAB ).
+
+      GS_S0100-CELLTAB = GT_CELLTAB.
+
+    ENDIF.
+
+
+
+
+*    CASE LS_GOOD_CELLS-FIELDNAME.
+*
+*      WHEN 'CARRID'OR  "### ID
+*           'CONNID'.  "###NO
+*
+*        PERFORM VALIDATION_CHK_UPDATE
+*                    USING LS_GOOD_CELLS-ROW_ID
+*                          LS_GOOD_CELLS-VALUE
+*                          LS_GOOD_CELLS-FIELDNAME.
+*
+*    ENDCASE.
+
+    MODIFY GT_S0100 FROM GS_S0100 INDEX LS_GOOD_CELLS-ROW_ID.
+    APPEND GS_S0100 TO GT_S0100_TEMP.
+  ENDLOOP.
+
+  " ### ## ## #### ####
+  IF LINE_EXISTS( GT_S0100[ ICON = ICON_RED_LIGHT ] ).
+    GV_ACTION_FLAG_0100 = 'D'.
+  ELSE.
+    GV_ACTION_FLAG_0100 = 'A'.
+  ENDIF.
+
+* PAI ## ## ##(USER_COMMOND) PBO#
+*#### #### ##
+  CALL METHOD CL_GUI_CFW=>SET_NEW_OK_CODE
+    EXPORTING
+      NEW_CODE = 'ENTER'.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form VALIDATION_CHK_UPDATE
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+FORM VALIDATION_CHK_UPDATE  USING  P_ROW_ID  P_VALUE   P_FIELDNAME.
+
+
+
+
+* IF p_fieldname = 'CARRID'.
+*
+*
+*    gs_drop_0100 = GT_DROP_0100[ HANDLE = '1'
+*                                 INT_VALUE = p_fieldname ].
+*
+*
+**    gs_s0100-CARRNAME  = gs_drop_0100-VALUE+
+*
+* ENDIF.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form set_ddlist_value
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+FORM SET_DDLIST_VALUE .
+  DATA : LS_DROPDOWN  TYPE LVC_S_DRAL.
+
+  SELECT DISTINCT CARRID AS  INT_VALUE
+                  CARRNAME AS VALUE
+     FROM SCARR
+  INTO CORRESPONDING FIELDS OF TABLE GT_DROPDOWN.
+
+  LS_DROPDOWN-HANDLE     = '100001'.
+  MODIFY GT_DROPDOWN FROM LS_DROPDOWN
+         TRANSPORTING HANDLE
+         WHERE HANDLE = 0.
+
+
+  DATA: LV_HANDLE     TYPE INT4,
+        LV_COUNTRY    TYPE SCITAIRP-COUNTRY,
+        LV_AIRPORT    TYPE SCITAIRP-AIRPORT,
+        LV_MASTERCITY TYPE SCITAIRP-MASTERCITY.
+
+  SELECT DISTINCT COUNTRY
+       FROM SCITAIRP
+       INTO LV_COUNTRY.
+
+    FIND FIRST OCCURRENCE OF LV_COUNTRY+0(1) IN SY-ABCDE
+        IN CHARACTER MODE MATCH OFFSET DATA(LV_OFFSET1).
+
+    FIND FIRST OCCURRENCE OF LV_COUNTRY+1(2) IN SY-ABCDE
+       IN CHARACTER MODE MATCH OFFSET DATA(LV_OFFSET2).
+
+    DATA(LV_OFFSET) = LV_OFFSET1 && LV_OFFSET2.
+
+    CHECK SY-SUBRC = 0.
+
+    LV_HANDLE = 100100 + LV_OFFSET.
+
+    SELECT DISTINCT AIRPORT
+          FROM SCITAIRP
+          WHERE COUNTRY = @LV_COUNTRY
+          INTO @LV_AIRPORT .
+
+      READ TABLE GT_DROPDOWN WITH KEY HANDLE     = LV_HANDLE
+                                      INT_VALUE  = LV_AIRPORT
+           TRANSPORTING NO FIELDS.
+      IF SY-SUBRC NE 0.
+        APPEND VALUE #( HANDLE    = LV_HANDLE
+                        INT_VALUE = LV_AIRPORT
+                        VALUE     =  LV_AIRPORT ) TO GT_DROPDOWN.
+      ENDIF.
+    ENDSELECT .
+  ENDSELECT.
+
+
+  SORT GT_DROPDOWN BY HANDLE VALUE.
+
+*  SELECT CARRID, "### ##
+*        CARRNAME "#####
+* FROM SCARR
+* INTO TABLE @DATA(LT_SCARR).
+*
+*  LOOP AT LT_SCARR INTO DATA(LS_SCARR).
+*    GS_DROP_0100-HANDLE = '1'.
+*    GS_DROP_0100-INT_VALUE = LS_SCARR-CARRID.
+*    GS_DROP_0100-VALUE   =  LS_SCARR-CARRID && ':' && LS_SCARR-CARRNAME.
+**    GS_DROP_0100-VALUE   =  LS_SCARR-CARRNAME .
+*    APPEND  GS_DROP_0100 TO GT_DROP_0100.
+*    CLEAR  GS_DROP_0100.
+*  ENDLOOP.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form LCA_HS_0100
+*&---------------------------------------------------------------------*
+*& hotspot click
+*&---------------------------------------------------------------------*
+FORM LCA_HS_0100  USING  PV_INDEX
+                         PV_FIELDNAME
+                         PS_WORK   TYPE ANY.
+
+  DATA : LV_URL LIKE  BXMNODES-URL.
+
+  FIELD-SYMBOLS : <FS>.
+
+  DATA(LV_FNAME) = 'PS_WORK-' && PV_FIELDNAME .
+  ASSIGN (LV_FNAME) TO <FS>.
+
+  CHECK <FS> IS NOT INITIAL.
+
+  DATA(LS_S0100) = GT_S0100[ PV_INDEX ].
+
+  CASE PV_FIELDNAME.
+    WHEN 'URL'.
+      LV_URL = <FS>.
+      CALL FUNCTION 'PRGN_GENER_EXECUTE_URL'
+        EXPORTING
+          NODE_DATA = LV_URL.
+*      SET PARAMETER ID: 'BLN' FIELD LS_S0100-BELNR,
+*                     'BUK' FIELD LS_S0100-BUKRS,
+*                     'GJR' FIELD LS_S0100-GJAHR.
+*      CALL TRANSACTION 'FB03' AND SKIP FIRST SCREEN.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.   " LCA_HS_0100\
+*&---------------------------------------------------------------------*
+*& Form LCA_BT_0100_BUTTON
+*&---------------------------------------------------------------------*
+*& Button click
+*&---------------------------------------------------------------------*
+FORM LCA_BT_0100_BUTTON   USING PV_ROW_ID TYPE INT4
+                                PS_WORK  TYPE TYS_S0100.
+
+  TRY.
+      DATA(LS_S0100) = GT_S0100[ PV_ROW_ID ].
+    CATCH CX_SY_ITAB_LINE_NOT_FOUND .
+
+  ENDTRY.
+
+
+
+ENDFORM. " LCA_BT_0100_BUTTON
+*&---------------------------------------------------------------------*
+*& Form luc_save_0100
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM LUC_SAVE_0100 .
+  CLEAR :GT_CELLTAB.
+  " ## ## ###
+  CHECK GO_COMFUNC->CHECK_MESSAGE( IV_MSG = 'S' ) = 'X'.
+
+  IF GT_S0100_DEL IS NOT INITIAL.
+    SELECT * FROM SPFLI AS A INNER JOIN @GT_S0100_DEL AS B
+      ON A~CARRID = B~CARRID AND A~CONNID = B~CONNID
+      INTO TABLE @DATA(LT_SPFLI_DEL).
+
+    IF LT_SPFLI_DEL[] IS NOT INITIAL.
+      DELETE SPFLI FROM TABLE  @LT_SPFLI_DEL.
+    ENDIF.
+  ENDIF.
+
+  DELETE GT_S0100_TEMP WHERE ICON = ICON_GREEN_LIGHT.
+
+  DATA(LT_SPFLI) = CORRESPONDING TYT_SPFLIX( GT_S0100_TEMP ).
+
+*  DATA(LS_SPFLI) = VALUE TYPE# ##( RUSER  = SY-UNAME
+*                                      RDATE  = SY-DATUM
+*                                      RTIME  = SY-UZEIT ).
+
+*  MODIFY LT_SPFLI FROM LS_SPFLI
+*         TRANSPORTING RUSER RDATE RTIME
+*         WHERE ICON = ICON_YELLOW_LIGHT.
+
+
+  IF LT_SPFLI IS NOT INITIAL.
+    MODIFY SPFLI FROM TABLE LT_SPFLI.
+  ENDIF.
+
+
+  COMMIT WORK AND WAIT.
+
+  DATA(LS_S0100) = VALUE TYS_S0100( ICON = ICON_GREEN_LIGHT
+                                    MESSAGE = SPACE
+                                    CELLTAB = GT_CELLTAB ).
+  MODIFY GT_S0100 FROM LS_S0100
+         TRANSPORTING ICON MESSAGE CELLTAB
+         WHERE ICON = ICON_YELLOW_LIGHT.
+
+  MESSAGE S001 WITH TEXT-S01.  " & ### ## #####.
+
+  CLEAR : GT_S0100_TEMP,GV_SAVE_FLAG_0100.
+  GT_S0100_TEMP[] = GT_S0100[].
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form VALIDATION_0100
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM VALIDATION_0100 .
+  " ### ## ## #### ####
+  IF LINE_EXISTS( GT_S0100[ ICON = ICON_RED_LIGHT ] ).
+    GV_ACTION_FLAG_0100 = 'D'.
+    MESSAGE I002 WITH TEXT-E02 DISPLAY LIKE 'E'.
+    REJECT.
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form LCA_TOOLBAR_0100
+*&---------------------------------------------------------------------*
+* TOOLBAR ## ##
+*&---------------------------------------------------------------------*
+FORM SET_ALV_TOOLMENU_0100 USING  PV_DYNNR    TYPE SY-DYNNR
+                                  EV_OBJECT TYPE REF TO  CL_CTMENU
+                                  PV_UCOMM LIKE SY-UCOMM.
+
+  DATA: LT_DROP  TYPE LVC_T_DRAL,
+        LV_FCODE TYPE SY-UCOMM,
+        LV_TEXT  TYPE  TEXT40.
+
+*#--List ##
+  APPEND VALUE #( HANDLE = SPACE VALUE = 'Choice 1' INT_VALUE = 'A' ) TO LT_DROP.
+  APPEND VALUE #( HANDLE = SPACE VALUE = 'Choice 2' INT_VALUE = 'B' ) TO LT_DROP.
+  APPEND VALUE #( HANDLE = SPACE VALUE = 'Choice 3' INT_VALUE = 'C' ) TO LT_DROP.
+
+*#--List ##
+  CASE PV_UCOMM.
+    WHEN 'BTN_LIST'.
+
+      LOOP AT LT_DROP INTO DATA(LS_DROP).
+        CLEAR: LV_TEXT, LV_FCODE.
+        IF LS_DROP-INT_VALUE IS NOT INITIAL.
+          LV_TEXT  = LS_DROP-VALUE.     " ##### text
+          LV_FCODE = LS_DROP-INT_VALUE.   "#### sy-ucomm# ## #
+        ELSE.
+*          lv_text  = gc_text.
+*          lv_fcode = gc_drop_cmd-000.    "#Enter## user command ## ##
+        ENDIF.
+
+        CALL METHOD EV_OBJECT->ADD_FUNCTION
+          EXPORTING
+            FCODE = LV_FCODE
+            TEXT  = LV_TEXT.
+      ENDLOOP.
+  ENDCASE.
+ENDFORM.
