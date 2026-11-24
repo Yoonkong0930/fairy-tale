@@ -1,0 +1,49 @@
+*&---------------------------------------------------------------------*
+*& Include          ZR_JIK_TEMP_ALV_CL1I01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Module  EXIT_0100  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE EXIT_0100 INPUT.
+  IF GO_ALV_INFO->EXIT_PROGRAM( IV_SAVE_FLAG = GV_SAVE_FLAG_0100 ) = 'X'.
+    LEAVE TO SCREEN 0.
+  ENDIF.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  GET_OKCODE  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE GET_OKCODE INPUT.
+
+  GV_SAVE_OK = GV_OK_CODE.
+  CLEAR GV_OK_CODE.
+
+ENDMODULE.                 " GET_OKCODE  INPUT
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0100  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE USER_COMMAND_0100 INPUT.
+
+  GV_ERROR_IN_DATA = GO_ALV_INFO->CHECK_CHANGED_DATA( GO_GRID_0100 ).
+  GV_EXIT_FLAG     = GO_ALV_INFO->DISPATCH( ).
+  IF GV_EXIT_FLAG = 'X' OR GV_ERROR_IN_DATA = 'X'.
+    EXIT.
+  ENDIF.
+
+  " process..
+  CASE GV_SAVE_OK.
+    WHEN 'SAVE'.  " ##
+      PERFORM VALIDATION_0100.
+      PERFORM LUC_SAVE_0100.
+    WHEN OTHERS.
+  ENDCASE.
+
+  "  CLEAR ok code!
+  CLEAR: GV_SAVE_OK.
+
+ENDMODULE.                 " USER_COMMAND_0100  INPUT
