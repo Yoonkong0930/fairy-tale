@@ -1,0 +1,22 @@
+{
+  "name": "monggeul-forest",
+  "private": true,
+  "version": "0.1.0",
+  "description": "몽글숲 - 2~4세 어린이를 위한 감정 동화 영상 (Remotion)",
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "remotion render",
+    "still": "remotion still",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.546",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "remotion": "4.0.546"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.8",
+    "typescript": "5.8.3"
+  }
+}
