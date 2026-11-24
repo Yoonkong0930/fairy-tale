@@ -1,0 +1,62 @@
+{
+  "mouth-neutral": {
+    "w": 224,
+    "h": 86,
+    "anchorX": 109.5,
+    "anchorY": -1.0,
+    "scale": 1.0
+  },
+  "mouth-happy": {
+    "w": 257,
+    "h": 219,
+    "anchorX": 125.5,
+    "anchorY": -1.0,
+    "scale": 1.0
+  },
+  "mouth-talk-s": {
+    "w": 108,
+    "h": 130,
+    "anchorX": 53.0,
+    "anchorY": -1.0,
+    "scale": 1.0094
+  },
+  "mouth-talk-m": {
+    "w": 179,
+    "h": 160,
+    "anchorX": 88.0,
+    "anchorY": -1.0,
+    "scale": 1.0094
+  },
+  "mouth-talk-l": {
+    "w": 194,
+    "h": 239,
+    "anchorX": 94.5,
+    "anchorY": -1.0,
+    "scale": 1.0
+  },
+  "mouth-sad": {
+    "w": 142,
+    "h": 101,
+    "anchorX": 69.0,
+    "anchorY": -1.0,
+    "scale": 1.0094
+  },
+  "mouth-angry": {
+    "w": 234,
+    "h": 111,
+    "anchorX": 115.5,
+    "anchorY": -25.0,
+    "scale": 1.0
+  },
+  "mouth-o": {
+    "w": 122,
+    "h": 132,
+    "anchorX": 60.0,
+    "anchorY": -43.0,
+    "scale": 1.0094
+  },
+  "nose": {
+    "w": 107,
+    "h": 59
+  }
+}
