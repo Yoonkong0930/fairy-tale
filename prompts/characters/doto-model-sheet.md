@@ -1,4 +1,4 @@
-# 도토 설정화(모델 시트) 프롬프트
+# 도토 설정화(모델 시트) 프롬프트 (v2: 한국 다람쥐, 작은 몸통, 통통한 볼, 동그란 눈, 얇은 눈썹)
 
 목적: 도토의 기준 그림. 이후 모든 파츠·표정·포즈는 이 그림을 기준 이미지(--ref)로 넣어서 생성합니다.
 
@@ -11,12 +11,15 @@
 ```prompt
 Character model sheet for a children's animated series for toddlers (ages 2-4).
 
-Character: "Doto", a baby squirrel. Curious and brave, warm and friendly.
-- Very round, chubby, soft shapes. Big head, about 2.5 heads tall. Short little arms and legs.
-- Large shiny dark-brown eyes with a white highlight, small round nose, pink blush cheeks.
-- Fur color: warm acorn orange. Cream-colored belly and muzzle.
-- Big fluffy tail curling up behind the body, simplified into 2-3 soft clumps, with a cream stripe.
-- Small pointed ears with tiny tufts.
+Character: "Doto", a Korean baby chipmunk (Korean squirrel, "daramjwi"). Curious and brave, warm and friendly.
+- Very round and soft shapes. Big round head, SMALL compact body (body clearly smaller than the head). Short little arms and legs.
+- Extra chubby, puffy round cheeks that bulge out on both sides of the face, like cheeks stuffed with acorns.
+- Eyes: large, perfectly round, glossy dark-brown eyes with two white highlights each. Thin, short, delicate eyebrows.
+- Small round nose, tiny smiling mouth, soft pink blush on the cheeks.
+- Fur: light warm tan / beige. Cream-white muzzle, cheeks and belly.
+- Korean chipmunk markings: three thin darker-brown stripes on the top of the head and dark stripes running down the back.
+- Small round ears (no ear tufts).
+- Fluffy tail curling up behind the body, simplified into 2-3 soft clumps, with a darker stripe.
 - Holds a small green acorn as a signature item.
 
 Layout: three full-body views side by side on a plain white background — front view, three-quarter view, back view. Neutral standing pose with arms slightly away from the body so the arms, legs and tail do not overlap the torso. Same scale and same character in all three views.
