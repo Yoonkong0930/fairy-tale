@@ -2,6 +2,7 @@ import { Composition } from "remotion";
 import { TestScene } from "./scenes/TestScene";
 import { RigTest } from "./scenes/RigTest";
 import { ToriDemo } from "./scenes/ToriDemo";
+import { MomoRigTest } from "./scenes/MomoRigTest";
 import { FPS, HEIGHT, WIDTH } from "./lib/video";
 
 export const RemotionRoot: React.FC = () => {
@@ -20,6 +21,8 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="RigTest" component={RigTest} durationInFrames={FPS * 18} fps={FPS} width={WIDTH} height={HEIGHT} />
       {/* 걷기 + 인사 + 음성 입모양 데모 */}
       <Composition id="ToriDemo" component={ToriDemo} durationInFrames={FPS * 19} fps={FPS} width={WIDTH} height={HEIGHT} />
+      {/* 모모 리그 확인 (토리와 크기 비교) */}
+      <Composition id="MomoRigTest" component={MomoRigTest} durationInFrames={FPS * 18} fps={FPS} width={WIDTH} height={HEIGHT} />
     </>
   );
 };

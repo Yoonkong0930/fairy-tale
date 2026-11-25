@@ -1,6 +1,5 @@
-import { useMemo } from "react";
-import { useAudioData } from "@remotion/media-utils";
-import { Img, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { Part, useMouthLevel, Voice } from "../lib/rig";
 import { blink, wave } from "../lib/anim";
 
 /**
@@ -24,40 +23,6 @@ export const HEART_COLORS: Record<ToriEmotion, string> = {
 };
 
 const P = (p: string) => staticFile(`assets/characters/tori/${p}.png`);
-
-type PartProps = {
-  src: string;
-  w: number;
-  h: number;
-  /** 파츠를 붙일 위치 (리그 좌표) */
-  x: number;
-  y: number;
-  /** 이미지 안에서 pivot 위치 (0~1 비율) */
-  px?: number;
-  py?: number;
-  rotate?: number;
-  scale?: number;
-  scaleY?: number;
-  /** 좌우 반전 (-1) */
-  flipX?: number;
-  z?: number;
-};
-
-const Part: React.FC<PartProps> = ({ src, w, h, x, y, px = 0.5, py = 0.5, rotate = 0, scale = 1, scaleY = 1, flipX = 1, z }) => (
-  <Img
-    src={src}
-    style={{
-      position: "absolute",
-      width: w,
-      height: h,
-      left: x - w * px,
-      top: y - h * py,
-      transformOrigin: `${px * 100}% ${py * 100}%`,
-      transform: `rotate(${rotate}deg) scale(${scale * flipX}, ${scale * scaleY})`,
-      zIndex: z,
-    }}
-  />
-);
 
 /** 파츠 위치표 (리그 단위). 숫자를 바꿔가며 맞춤 */
 export const TORI_LAYOUT = {
@@ -94,31 +59,7 @@ type Props = {
   /** 바라보는 방향: 1 = 오른쪽, -1 = 왼쪽 (눈은 반전하지 않아 반짝이 유지) */
   facing?: 1 | -1;
   /** 대사 음성: 소리 크기에 맞춰 입이 움직임. from = 장면에서 음성이 시작되는 프레임 */
-  voice?: { src: string; from: number };
-};
-
-/** 음성 크기 → 입 크기 단계 (0 닫힘, 1 작게, 2 중간, 3 크게) */
-const useMouthLevel = (voice: Props["voice"], frame: number, fps: number) => {
-  const data = useAudioData(voice ? voice.src : staticFile("audio/silence.wav"));
-  const rmsTrack = useMemo(() => {
-    if (!voice || !data) return null;
-    const x = data.channelWaveforms[0];
-    const win = Math.floor(data.sampleRate / fps);
-    const out: number[] = [];
-    for (let i = 0; i + win <= x.length; i += win) {
-      let sum = 0;
-      for (let j = i; j < i + win; j++) sum += x[j] * x[j];
-      out.push(Math.sqrt(sum / win));
-    }
-    const peak = Math.max(...out, 1e-6);
-    return out.map((v) => v / peak);
-  }, [data, voice, fps]);
-  if (!voice || !rmsTrack) return -1; // 음성 없음
-  const i = frame - voice.from;
-  if (i < 0 || i >= rmsTrack.length) return -1;
-  // 앞뒤 프레임을 살짝 섞어서 입이 너무 떨리지 않게
-  const v = (rmsTrack[i] * 2 + (rmsTrack[i - 1] ?? 0) + (rmsTrack[i + 1] ?? 0)) / 4;
-  return v < 0.08 ? 0 : v < 0.3 ? 1 : v < 0.6 ? 2 : 3;
+  voice?: Voice;
 };
 
 export const ToriRig: React.FC<Props> = ({
