@@ -3,6 +3,7 @@ import { TestScene } from "./scenes/TestScene";
 import { RigTest } from "./scenes/RigTest";
 import { ToriDemo } from "./scenes/ToriDemo";
 import { MomoRigTest } from "./scenes/MomoRigTest";
+import { RigCompare } from "./scenes/RigCompare";
 import { FPS, HEIGHT, WIDTH } from "./lib/video";
 
 export const RemotionRoot: React.FC = () => {
@@ -23,6 +24,8 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="ToriDemo" component={ToriDemo} durationInFrames={FPS * 19} fps={FPS} width={WIDTH} height={HEIGHT} />
       {/* 모모 리그 확인 (토리와 크기 비교) */}
       <Composition id="MomoRigTest" component={MomoRigTest} durationInFrames={FPS * 18} fps={FPS} width={WIDTH} height={HEIGHT} />
+      {/* 원본 설정화 비교용 정지 화면 */}
+      <Composition id="RigCompare" component={RigCompare} durationInFrames={1} fps={FPS} width={WIDTH} height={HEIGHT} defaultProps={{ who: "tori" as const }} />
     </>
   );
 };
