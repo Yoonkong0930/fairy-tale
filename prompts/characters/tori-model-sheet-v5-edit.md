@@ -1,9 +1,9 @@
-# 도토 설정화 5차 (4차-b 기준 수정)
-- ref: art/drafts/doto-sheet-test4b.png
+# 토리 설정화 5차 (4차-b 기준 수정)
+- ref: art/drafts/tori-sheet-test4b.png
 - 변경: 모자 제거, 둥글둥글한 앞머리(애교머리) 추가, 목걸이를 목에 딱 맞는 초커(강아지 목걸이) 형태로
 
 ```prompt
-Edit this character model sheet of "Doto", a Korean baby chipmunk. Keep everything else exactly the same — face, eyes, thin eyebrows, cheek size, body proportions, striped S-curved tail, back stripes, colors, pose, line style and the layout of the three views (front, three-quarter, back).
+Edit this character model sheet of "Tori", a Korean baby chipmunk. Keep everything else exactly the same — face, eyes, thin eyebrows, cheek size, body proportions, striped S-curved tail, back stripes, colors, pose, line style and the layout of the three views (front, three-quarter, back).
 
 Changes:
 1. Remove the acorn-cap hat completely. Show the top of the head with the head stripes visible again.

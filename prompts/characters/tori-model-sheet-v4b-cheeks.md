@@ -1,6 +1,6 @@
-# 도토 설정화 4차-b (볼만 수정)
-- ref 1: art/drafts/doto-sheet-test4a.png (모자, 목걸이, 꼬리, 등 줄무늬 그대로)
-- ref 2: art/drafts/doto-sheet-test3.png (볼 크기 기준)
+# 토리 설정화 4차-b (볼만 수정)
+- ref 1: art/drafts/tori-sheet-test4a.png (모자, 목걸이, 꼬리, 등 줄무늬 그대로)
+- ref 2: art/drafts/tori-sheet-test3.png (볼 크기 기준)
 
 ```prompt
 Edit the FIRST image. Keep everything exactly the same — the acorn-cap hat, the mint-green acorn necklace, the striped S-curved tail, the back stripes, the pose, colors, eyes, line style and layout of the three views.

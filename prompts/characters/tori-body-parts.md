@@ -1,6 +1,6 @@
-# 도토 몸 파츠 시트 (리깅용, 정면)
-- ref 1: art/final/doto-model-sheet.png (확정 디자인)
-- ref 2: art/final/doto-expressions.png (머리 모양·볼터치 기준)
+# 토리 몸 파츠 시트 (리깅용, 정면)
+- ref 1: art/final/tori-model-sheet.png (확정 디자인)
+- ref 2: art/final/tori-expressions.png (머리 모양·볼터치 기준)
 - 초록 단색 배경 → scripts/slice_parts.py 로 자름
 
 배치 (4열 x 3행)
@@ -11,7 +11,7 @@
 | 3 | 왼다리 | 오른다리 | 꼬리 | 마음 도토리 펜던트 |
 
 ```prompt
-Create a BODY PARTS SHEET for 2D cut-out rigging (like puppet animation) of the character "Doto", the Korean baby chipmunk in the reference images, FRONT VIEW. Every part must match the reference exactly: same colors (light warm tan fur, cream-white muzzle, cheeks and belly, dark-brown stripes), same bold smooth dark-brown outline, flat colors, same proportions and the same scale relative to each other as on the finished character.
+Create a BODY PARTS SHEET for 2D cut-out rigging (like puppet animation) of the character "Tori", the Korean baby chipmunk in the reference images, FRONT VIEW. Every part must match the reference exactly: same colors (light warm tan fur, cream-white muzzle, cheeks and belly, dark-brown stripes), same bold smooth dark-brown outline, flat colors, same proportions and the same scale relative to each other as on the finished character.
 
 Background: perfectly flat solid pure green (#00FF00) chroma-key background. No shadows, no gradients.
 

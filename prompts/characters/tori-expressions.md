@@ -1,5 +1,5 @@
-# 도토 표정 시트
-- ref: art/drafts/doto-sheet-test5.png (확정 디자인)
+# 토리 표정 시트
+- ref: art/drafts/tori-sheet-test5.png (확정 디자인)
 - 표정 6종 + 감정별 마음 도토리 색
 
 | 감정 | 목걸이 색 |
@@ -12,7 +12,7 @@
 | 놀람 | 주황 |
 
 ```prompt
-Using this character "Doto" (a Korean baby chipmunk) exactly as designed in the reference image — same face, round glossy eyes with two highlights, thin eyebrows, cheeks, round puffy cowlick on top of the head, head stripes, small round ears, colors, line style and the snug brown collar with the small glowing acorn pendant — create an EXPRESSION SHEET for a toddler animated series.
+Using this character "Tori" (a Korean baby chipmunk) exactly as designed in the reference image — same face, round glossy eyes with two highlights, thin eyebrows, cheeks, round puffy cowlick on top of the head, head stripes, small round ears, colors, line style and the snug brown collar with the small glowing acorn pendant — create an EXPRESSION SHEET for a toddler animated series.
 
 Layout: 6 front-facing bust portraits (head and upper chest, so the collar and pendant are visible), arranged in a grid of 3 columns x 2 rows, all the same size and scale, on a plain white background. No text, no labels.
 

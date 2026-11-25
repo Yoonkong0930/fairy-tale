@@ -1,10 +1,10 @@
 import { AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig } from "remotion";
-import { Doto, Emotion } from "../characters/Doto";
+import { Tori, Emotion } from "../characters/Tori";
 import { popIn } from "../lib/anim";
 
 /**
  * 파이프라인 테스트 장면
- * 0~2초: 도토가 통통 튀어나와 손 흔들며 인사
+ * 0~2초: 토리가 통통 튀어나와 손 흔들며 인사
  * 2~4초: 말하기 (자막)
  * 4~6초: 감정 표정 순서대로 보여주기
  */
@@ -18,7 +18,7 @@ export const TestScene: React.FC = () => {
     frame < fps * 4 ? "happy" : emotions[Math.floor((frame - fps * 4) / 12) % emotions.length];
 
   const subtitle =
-    frame < fps * 2 ? "" : frame < fps * 4 ? "안녕! 나는 몽글숲의 아기다람쥐 도토야!" : "기쁠 때, 놀랄 때, 슬플 때…";
+    frame < fps * 2 ? "" : frame < fps * 4 ? "안녕! 나는 몽글숲의 아기다람쥐 토리야!" : "기쁠 때, 놀랄 때, 슬플 때…";
 
   return (
     <AbsoluteFill style={{ background: "linear-gradient(#BFE6FF 0%, #E9F7FF 60%, #A8D98A 60%, #8CC870 100%)" }}>
@@ -29,7 +29,7 @@ export const TestScene: React.FC = () => {
       <div style={{ position: "absolute", right: 290, top: 470, width: 34, height: 170, background: "#8A5A35", borderRadius: 12 }} />
 
       <div style={{ transform: `scale(${enter})`, transformOrigin: "960px 800px", position: "absolute", inset: 0 }}>
-        <Doto
+        <Tori
           x={960}
           y={800}
           scale={1.25}

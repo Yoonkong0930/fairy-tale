@@ -1,6 +1,6 @@
-# 도토 얼굴 파츠 시트 (리깅용)
-- ref 1: art/final/doto-expressions.png (확정 표정)
-- ref 2: art/final/doto-model-sheet.png (확정 디자인)
+# 토리 얼굴 파츠 시트 (리깅용)
+- ref 1: art/final/tori-expressions.png (확정 표정)
+- ref 2: art/final/tori-model-sheet.png (확정 디자인)
 - 초록 단색 배경 → 스크립트로 배경 제거 후 파츠별 PNG로 자름
 
 배치 (4열 x 4행)
@@ -12,7 +12,7 @@
 | 4 입 | 말하기 크게 | 슬픔 | 화남(삐죽) | 놀람(o) |
 
 ```prompt
-Create a FACE PARTS SHEET for rigging the character "Doto" (the Korean baby chipmunk in the reference images). Draw the parts exactly in the same style, line weight and colors as the reference: bold smooth dark-brown outlines, flat colors.
+Create a FACE PARTS SHEET for rigging the character "Tori" (the Korean baby chipmunk in the reference images). Draw the parts exactly in the same style, line weight and colors as the reference: bold smooth dark-brown outlines, flat colors.
 
 Background: a perfectly flat, solid pure green (#00FF00) chroma-key background filling the whole image. No shadows, no gradients, no texture on the background.
 

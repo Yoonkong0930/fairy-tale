@@ -4,17 +4,17 @@ import { Img, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { blink, wave } from "../lib/anim";
 
 /**
- * 도토 컷아웃 리그 (실제 파츠 이미지 사용)
+ * 토리 컷아웃 리그 (실제 파츠 이미지 사용)
  *
  * 좌표계: "리그 단위" = 몸 파츠 시트의 픽셀. 원점(0,0)은 두 발 사이 바닥.
  * 각 파츠는 pivot(회전 중심)을 기준으로 배치·회전합니다.
- * 위치 숫자는 DOTO_LAYOUT 한 곳에서 조정합니다.
+ * 위치 숫자는 TORI_LAYOUT 한 곳에서 조정합니다.
  */
 
-export type DotoEmotion = "neutral" | "happy" | "angry" | "sad" | "scared" | "surprised";
+export type ToriEmotion = "neutral" | "happy" | "angry" | "sad" | "scared" | "surprised";
 
 /** 마음 도토리 색 (docs/02-세계관-캐릭터.md 규칙) */
-export const HEART_COLORS: Record<DotoEmotion, string> = {
+export const HEART_COLORS: Record<ToriEmotion, string> = {
   neutral: "#8FE3C0",
   happy: "#FFD84D",
   angry: "#FF5A4E",
@@ -23,7 +23,7 @@ export const HEART_COLORS: Record<DotoEmotion, string> = {
   surprised: "#FF9A3D",
 };
 
-const P = (p: string) => staticFile(`assets/characters/doto/${p}.png`);
+const P = (p: string) => staticFile(`assets/characters/tori/${p}.png`);
 
 type PartProps = {
   src: string;
@@ -60,7 +60,7 @@ const Part: React.FC<PartProps> = ({ src, w, h, x, y, px = 0.5, py = 0.5, rotate
 );
 
 /** 파츠 위치표 (리그 단위). 숫자를 바꿔가며 맞춤 */
-export const DOTO_LAYOUT = {
+export const TORI_LAYOUT = {
   legL: { x: -78, y: -6 },
   legR: { x: 78, y: -6 },
   torso: { x: 0, y: -70 }, // 몸통 아래 끝
@@ -84,7 +84,7 @@ type Props = {
   y: number;
   /** 화면 배율 (1 = 리그 단위 그대로, 키 약 1050px) */
   size?: number;
-  emotion?: DotoEmotion;
+  emotion?: ToriEmotion;
   talking?: boolean;
   waving?: boolean;
   /** 깜빡임 타이밍을 캐릭터마다 다르게 */
@@ -121,12 +121,12 @@ const useMouthLevel = (voice: Props["voice"], frame: number, fps: number) => {
   return v < 0.08 ? 0 : v < 0.3 ? 1 : v < 0.6 ? 2 : 3;
 };
 
-export const DotoRig: React.FC<Props> = ({
+export const ToriRig: React.FC<Props> = ({
   x, y, size = 0.6, emotion = "neutral", talking = false, waving = false, seed = 0, walking = false, facing = 1, voice,
 }) => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const L = DOTO_LAYOUT;
+  const L = TORI_LAYOUT;
   const mouthLevel = useMouthLevel(voice, f, fps);
 
   // 걷기: 한 걸음 = 12프레임, 다리 번갈아 들기 + 몸 통통 + 팔 흔들기

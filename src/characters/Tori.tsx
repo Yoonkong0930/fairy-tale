@@ -2,11 +2,11 @@ import { useCurrentFrame } from "remotion";
 import { blink, wave } from "../lib/anim";
 
 /**
- * 도토 (아기다람쥐, 주인공) — 임시 리그
+ * 토리 (아기다람쥐, 주인공) — 임시 리그
  *
  * 지금은 단순한 도형으로 그린 "자리표시" 캐릭터입니다.
  * 파이어플라이로 만든 파츠 PNG가 준비되면 각 <g> 안의 도형을
- * <Img src={staticFile("assets/characters/doto/<파츠>.png")} /> 로 바꾸기만 하면
+ * <Img src={staticFile("assets/characters/tori/<파츠>.png")} /> 로 바꾸기만 하면
  * 움직임 코드는 그대로 재사용됩니다.
  *
  * 각 파츠는 "회전 기준점(pivot)"을 중심으로 움직입니다.
@@ -32,7 +32,7 @@ const C = {
   acorn: "#8FC46B",
 };
 
-export const Doto: React.FC<Props> = ({
+export const Tori: React.FC<Props> = ({
   x,
   y,
   scale = 1,

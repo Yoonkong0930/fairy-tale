@@ -1,6 +1,6 @@
-# 도토 설정화(모델 시트) 프롬프트 (v3: 볼 줄임, 꼬리 키움, 팔 벌린 기본 자세)
+# 토리 설정화(모델 시트) 프롬프트 (v3: 볼 줄임, 꼬리 키움, 팔 벌린 기본 자세)
 
-목적: 도토의 기준 그림. 이후 모든 파츠·표정·포즈는 이 그림을 기준 이미지(--ref)로 넣어서 생성합니다.
+목적: 토리의 기준 그림. 이후 모든 파츠·표정·포즈는 이 그림을 기준 이미지(--ref)로 넣어서 생성합니다.
 
 포인트
 - 2~4세 대상: 둥글고 단순한 형태, 큰 머리(2.5등신), 큰 눈
@@ -11,7 +11,7 @@
 ```prompt
 Character model sheet for a children's animated series for toddlers (ages 2-4).
 
-Character: "Doto", a Korean baby chipmunk (Korean squirrel, "daramjwi"). Curious and brave, warm and friendly.
+Character: "Tori", a Korean baby chipmunk (Korean squirrel, "daramjwi"). Curious and brave, warm and friendly.
 - Very round and soft shapes. Big round head, SMALL compact body (body clearly smaller than the head). Short little arms and legs.
 - Chubby, soft round cheeks that puff out gently on both sides of the face (cute but moderate, not oversized; cheeks should NOT be visible from the back view).
 - Eyes: large, perfectly round, glossy dark-brown eyes with two white highlights each. Thin, short, delicate eyebrows.

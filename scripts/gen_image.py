@@ -3,10 +3,10 @@
 Gemini(Nano Banana) 이미지 생성 스크립트
 
 사용 예:
-  python3 scripts/gen_image.py --prompt-file prompts/characters/doto-model-sheet.md \
-      --out public/assets/characters/doto/model-sheet.png --aspect 16:9
+  python3 scripts/gen_image.py --prompt-file prompts/characters/tori-model-sheet.md \
+      --out public/assets/characters/tori/model-sheet.png --aspect 16:9
   python3 scripts/gen_image.py --prompt "같은 캐릭터, 눈을 감은 얼굴만" \
-      --ref public/assets/characters/doto/model-sheet.png --out ...
+      --ref public/assets/characters/tori/model-sheet.png --out ...
 
 API 키는 작업 환경의 네트워크 비밀값(x-goog-api-key 헤더)으로 자동 주입됩니다.
 로컬에서 직접 돌릴 때는 GEMINI_API_KEY 환경변수를 설정하세요.

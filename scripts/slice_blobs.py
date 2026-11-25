@@ -26,7 +26,7 @@ def main():
     alpha = np.clip(1 - (greenness - 40) / 120, 0, 1)
     im[..., 1] = np.where(alpha < 1, np.minimum(g, np.maximum(r, b)), g)
 
-    # 라벨 글자 = 순수 검정에 가까운 픽셀 (도토 외곽선은 갈색이라 R이 더 높음)
+    # 라벨 글자 = 순수 검정에 가까운 픽셀 (토리 외곽선은 갈색이라 R이 더 높음)
     text = (im.max(axis=2) < 45) & (np.abs(r - b) < 20)
     solid = alpha > 0.05
     lab, n = ndimage.label(solid)

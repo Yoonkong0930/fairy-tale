@@ -1,10 +1,10 @@
 import { AbsoluteFill, Audio, interpolate, Sequence, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { DotoRig } from "../characters/DotoRig";
+import { ToriRig } from "../characters/ToriRig";
 
 /**
- * 도토 데모: 걸어 들어와서 → 손 흔들고 → 음성에 맞춰 말하고 → 걸어 나감
+ * 토리 데모: 걸어 들어와서 → 손 흔들고 → 음성에 맞춰 말하고 → 걸어 나감
  */
-export const DotoDemo: React.FC = () => {
+export const ToriDemo: React.FC = () => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
   const S = (sec: number) => Math.round(sec * fps);
@@ -27,9 +27,9 @@ export const DotoDemo: React.FC = () => {
   return (
     <AbsoluteFill style={{ background: "linear-gradient(#CDEBFF 0%, #EEF8FF 62%, #B5DE96 62%, #9CD07E 100%)" }}>
       <Sequence from={voiceFrom}>
-        <Audio src={staticFile("audio/test-doto-hello.wav")} />
+        <Audio src={staticFile("audio/test-tori-hello.wav")} />
       </Sequence>
-      <DotoRig
+      <ToriRig
         x={x}
         y={1000}
         size={0.82}
@@ -37,11 +37,11 @@ export const DotoDemo: React.FC = () => {
         walking={walking}
         facing={facing}
         waving={waving}
-        voice={{ src: staticFile("audio/test-doto-hello.wav"), from: voiceFrom }}
+        voice={{ src: staticFile("audio/test-tori-hello.wav"), from: voiceFrom }}
       />
       {speaking && (
         <div style={{ position: "absolute", bottom: 50, width: "100%", textAlign: "center", fontSize: 60, fontWeight: 800, fontFamily: "sans-serif", color: "#4E2313", textShadow: "0 0 12px white, 0 0 12px white" }}>
-          안녕! 나는 몽글숲의 아기다람쥐 도토야! 만나서 정말 반가워!
+          안녕! 나는 몽글숲의 아기다람쥐 토리야! 만나서 정말 반가워!
         </div>
       )}
     </AbsoluteFill>

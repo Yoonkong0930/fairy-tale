@@ -10,7 +10,7 @@ import json, pathlib
 import numpy as np
 from PIL import Image
 
-D = pathlib.Path("public/assets/characters/doto/face")
+D = pathlib.Path("public/assets/characters/tori/face")
 PUPIL = np.array([78, 35, 19])
 
 
