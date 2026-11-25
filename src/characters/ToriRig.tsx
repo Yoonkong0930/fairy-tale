@@ -1,18 +1,17 @@
 import { staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { Part, useMouthLevel, Voice } from "../lib/rig";
 import { blink, wave } from "../lib/anim";
+import { FitPart, LEGACY_HEIGHT, Part, useMouthLevel, Voice, walkCycle } from "../lib/rig";
+import FIT from "./tori-fit.json";
 
 /**
- * 토리 컷아웃 리그 (실제 파츠 이미지 사용)
- *
- * 좌표계: "리그 단위" = 몸 파츠 시트의 픽셀. 원점(0,0)은 두 발 사이 바닥.
- * 각 파츠는 pivot(회전 중심)을 기준으로 배치·회전합니다.
- * 위치 숫자는 TORI_LAYOUT 한 곳에서 조정합니다.
+ * 토리 컷아웃 리그 (원본 설정화에 맞춘 파츠)
+ * - 몸 파츠·위치: scripts/fit_rig.py → src/characters/tori-fit.json, public/assets/characters/tori/fit/
+ * - 얼굴 파츠(눈·눈썹·코·입): public/assets/characters/tori/face/ (위치·크기는 원본에서 잰 값)
+ * - 마음 도토리 펜던트는 SVG로 그림 (감정별 색)
  */
 
 export type ToriEmotion = "neutral" | "happy" | "angry" | "sad" | "scared" | "surprised";
 
-/** 마음 도토리 색 (docs/02-세계관-캐릭터.md 규칙) */
 export const HEART_COLORS: Record<ToriEmotion, string> = {
   neutral: "#8FE3C0",
   happy: "#FFD84D",
@@ -22,43 +21,41 @@ export const HEART_COLORS: Record<ToriEmotion, string> = {
   surprised: "#FF9A3D",
 };
 
-const P = (p: string) => staticFile(`assets/characters/tori/${p}.png`);
+const BASE = "assets/characters/tori";
+const S = (p: string) => staticFile(`${BASE}/${p}.png`);
+const PARTS = FIT.parts;
+const FACE = FIT.face;
 
-/** 파츠 위치표 (리그 단위). 숫자를 바꿔가며 맞춤 */
-export const TORI_LAYOUT = {
-  legL: { x: -78, y: -6 },
-  legR: { x: 78, y: -6 },
-  torso: { x: 0, y: -70 }, // 몸통 아래 끝
-  head: { x: 0, y: -440 }, // 목(머리 회전 중심)
-  shoulderL: { x: -165, y: -395 },
-  shoulderR: { x: 165, y: -395 },
-  tail: { x: 120, y: -150 }, // 꼬리 뿌리
-  // 머리 이미지(650x539) 안의 얼굴 위치
-  face: {
-    eyeL: { x: 200, y: 232 },
-    eyeR: { x: 450, y: 232 },
-    browY: 150,
-    nose: { x: 325, y: 300 },
-  },
+// 얼굴 파츠 원본 크기 (face/parts.json 참고)
+const EYE_PNG: Record<string, [number, number]> = {
+  "face/eye-open": [295, 292],
+  "face/eye-surprised": [295, 292],
+  "face/eye-happy": [298, 159],
+  "face/eye-blink": [317, 121],
 };
-
-const FACE = { eye: 0.36, brow: 0.22, nose: 0.46, mouth: 0.44 };
+const EYE_VISIBLE = 283; // eye-open 그림 안의 실제 눈 지름
+const MOUTH: Record<string, { w: number; h: number; ax: number; ay: number }> = {
+  "mouth-neutral": { w: 224, h: 86, ax: 109.5, ay: -1 },
+  "mouth-happy": { w: 257, h: 219, ax: 125.5, ay: -1 },
+  "mouth-talk-s": { w: 108, h: 130, ax: 53, ay: -1 },
+  "mouth-talk-m": { w: 179, h: 160, ax: 88, ay: -1 },
+  "mouth-talk-l": { w: 194, h: 239, ax: 94.5, ay: -1 },
+  "mouth-sad": { w: 142, h: 101, ax: 69, ay: -1 },
+  "mouth-angry": { w: 234, h: 111, ax: 115.5, ay: -25 },
+  "mouth-o": { w: 122, h: 132, ax: 60, ay: -43 },
+};
 
 type Props = {
   x: number;
   y: number;
-  /** 화면 배율 (1 = 리그 단위 그대로, 키 약 1050px) */
+  /** 화면 배율 (1 = 키 약 1050px) */
   size?: number;
   emotion?: ToriEmotion;
   talking?: boolean;
   waving?: boolean;
-  /** 깜빡임 타이밍을 캐릭터마다 다르게 */
   seed?: number;
-  /** 걷기 동작 (이동 자체는 장면에서 x를 바꿔서) */
   walking?: boolean;
-  /** 바라보는 방향: 1 = 오른쪽, -1 = 왼쪽 (눈은 반전하지 않아 반짝이 유지) */
   facing?: 1 | -1;
-  /** 대사 음성: 소리 크기에 맞춰 입이 움직임. from = 장면에서 음성이 시작되는 프레임 */
   voice?: Voice;
 };
 
@@ -67,146 +64,70 @@ export const ToriRig: React.FC<Props> = ({
 }) => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const L = TORI_LAYOUT;
   const mouthLevel = useMouthLevel(voice, f, fps);
+  const walk = walkCycle(f, walking);
+  const k = 2; // 리그 좌표가 예전보다 약 2배 → 움직임 크기 보정
 
-  // 걷기: 한 걸음 = 12프레임, 다리 번갈아 들기 + 몸 통통 + 팔 흔들기
-  const step = walking ? (f % 24) / 24 : 0;
-  const stepWave = walking ? Math.sin(step * Math.PI * 2) : 0;
-  const walkBob = walking ? -Math.abs(Math.sin(step * Math.PI * 2)) * 18 : 0;
-  const legLiftL = walking ? Math.max(0, stepWave) * 34 : 0;
-  const legLiftR = walking ? Math.max(0, -stepWave) * 34 : 0;
-
-  // 생명감
   const breathe = wave(f, 60, seed) * 0.012;
-  const headTilt = wave(f, 90, seed) * 2.5 + (emotion === "sad" ? 6 : 0);
-  const tailSwing = wave(f, 50, seed) * 7 + (emotion === "happy" ? wave(f, 8) * 6 : 0);
-  const earTwitch = (k: number) => (wave(f + k * 7, 140, seed) > 0.96 ? -8 : 0);
-  const shiver = emotion === "scared" ? wave(f, 3) * 3 : 0;
-  const hop = emotion === "happy" ? -Math.abs(wave(f, 18)) * 30 : 0;
+  const headTilt = wave(f, 90, seed) * 2 + (emotion === "sad" ? 5 : 0);
+  const tailSwing = wave(f, 50, seed) * 5 + (emotion === "happy" ? wave(f, 8) * 5 : 0);
+  const earTwitch = (n: number) => (wave(f + n * 7, 140, seed) > 0.96 ? -8 : 0);
+  const shiver = emotion === "scared" ? wave(f, 3) * 3 * k : 0;
+  const hop = emotion === "happy" ? -Math.abs(wave(f, 18)) * 30 * k : 0;
   const closed = blink(f, 95, seed * 13 + 30);
+  const earDrop = emotion === "sad" || emotion === "scared" ? 18 : 0;
 
-  // 팔
-  const armL = walking ? stepWave * 14 : emotion === "happy" ? -25 + wave(f, 18) * 8 : 4 + wave(f, 60, seed) * 2;
-  const armR = walking ? -stepWave * 14 : emotion === "happy" ? 25 - wave(f, 18) * 8 : -4 - wave(f, 60, seed) * 2;
+  const armL = walking ? walk.stepWave * 12 : emotion === "happy" ? 25 + wave(f, 18) * 8 : 2 + wave(f, 60, seed) * 2;
+  const armR = walking ? -walk.stepWave * 12 : emotion === "happy" ? -25 - wave(f, 18) * 8 : -2 - wave(f, 60, seed) * 2;
 
   // 눈
   const eyeSrc =
     emotion === "happy" ? "face/eye-happy" : emotion === "surprised" || emotion === "scared" ? "face/eye-surprised" : closed > 0.5 ? "face/eye-blink" : "face/eye-open";
-  const eyeSize: Record<string, [number, number]> = {
-    "face/eye-open": [295, 292],
-    "face/eye-surprised": [295, 292],
-    "face/eye-happy": [298, 159],
-    "face/eye-blink": [317, 121],
-  };
-  const [ew, eh] = eyeSize[eyeSrc];
+  const [ew, eh] = EYE_PNG[eyeSrc];
+  const eyeScale = FACE.eyeL.d / EYE_VISIBLE;
 
   // 눈썹
-  const brow =
+  const brow: [string, number, number] =
     emotion === "angry" ? ["face/brow-angry", 278, 125] : emotion === "sad" ? ["face/brow-sad", 278, 125] : emotion === "scared" ? ["face/brow-worried", 316, 80] : ["face/brow-neutral", 301, 71];
+  const browScale = (FACE.brow.w * 1.15) / 301;
 
-  // 입 (talking이면 크기 3단계를 번갈아)
+  // 입
   const talkFrames = ["mouth-talk-s", "mouth-talk-m", "mouth-talk-l", "mouth-talk-m"];
   const emotionMouth = ({ neutral: "mouth-neutral", happy: "mouth-happy", angry: "mouth-angry", sad: "mouth-sad", scared: "mouth-angry", surprised: "mouth-o" } as const)[emotion];
-  const voiceMouths: string[] = ["mouth-neutral", "mouth-talk-s", "mouth-talk-m", "mouth-talk-l"];
+  const voiceMouths = ["mouth-neutral", "mouth-talk-s", "mouth-talk-m", "mouth-talk-l"];
   let mouthName: string = emotionMouth;
   if (mouthLevel > 0) mouthName = voiceMouths[mouthLevel];
   else if (mouthLevel < 0 && talking) mouthName = talkFrames[Math.floor(f / 4) % talkFrames.length];
-  const MOUTH: Record<string, { w: number; h: number; ax: number; ay: number }> = {
-    "mouth-neutral": { w: 224, h: 86, ax: 109.5, ay: -1 },
-    "mouth-happy": { w: 257, h: 219, ax: 125.5, ay: -1 },
-    "mouth-talk-s": { w: 108, h: 130, ax: 53, ay: -1 },
-    "mouth-talk-m": { w: 179, h: 160, ax: 88, ay: -1 },
-    "mouth-talk-l": { w: 194, h: 239, ax: 94.5, ay: -1 },
-    "mouth-sad": { w: 142, h: 101, ax: 69, ay: -1 },
-    "mouth-angry": { w: 234, h: 111, ax: 115.5, ay: -25 },
-    "mouth-o": { w: 122, h: 132, ax: 60, ay: -43 },
-  };
   const m = MOUTH[mouthName];
-  const noseW = 107 * FACE.nose;
-  const noseH = 59 * FACE.nose;
-  const noseBottom = L.face.nose.y + noseH / 2 - 4;
+  const mouthScale = FACE.mouth.w / 224;
+  const noseScale = FACE.nose.w / 101;
+  const noseH = 59 * noseScale;
 
   const heart = HEART_COLORS[emotion];
+  const unit = (size * LEGACY_HEIGHT) / FIT.height;
+  const head = PARTS.head;
+  const shoulderR = PARTS.armR.pivot;
+  // 원본 펜던트 영역(빛 포함)에 맞춰 크기·위치
+  const [pbx, pby, pbw, pbh] = PARTS.pendant_box;
+  const pendScale = (pbw * 0.66) / 46;
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        left: x + shiver,
-        top: y + hop + walkBob,
-        width: 0,
-        height: 0,
-        transform: `scale(${size * facing}, ${size})`,
-        transformOrigin: "0 0",
-      }}
-    >
-      {/* 꼬리 (가장 뒤) */}
-      <Part src={P("body/tail")} w={467} h={435} x={L.tail.x} y={L.tail.y} px={0.12} py={0.88} rotate={tailSwing} z={1} />
-
-      {/* 다리 */}
-      <Part src={P("body/leg-l")} w={256} h={365} x={L.legL.x} y={L.legL.y - legLiftL} px={0.5} py={1} rotate={-legLiftL * 0.25} z={2} />
-      <Part src={P("body/leg-r")} w={256} h={365} x={L.legR.x} y={L.legR.y - legLiftR} px={0.5} py={1} rotate={legLiftR * 0.25} z={2} />
-
-      {/* 몸통: 아래 끝 기준으로 숨쉬기 */}
-      <Part src={P("body/torso")} w={451} h={451} x={L.torso.x} y={L.torso.y} px={0.5} py={1} scaleY={1 + breathe} z={3} />
-
-      {/* 팔: 어깨가 pivot */}
-      <Part src={P("body/arm-l")} w={207} h={402} x={L.shoulderL.x} y={L.shoulderL.y} px={0.6} py={0.1} rotate={armL} scale={0.72} z={5} />
+    <div style={{ position: "absolute", left: x + shiver * unit, top: y + (hop + walk.bob * k) * unit, width: 0, height: 0, transform: `scale(${unit * facing}, ${unit})`, transformOrigin: "0 0" }}>
+      {/* 꼬리: 몸 쪽 아래(오른쪽 아래)가 뿌리 */}
+      <FitPart base={BASE} p={PARTS.tail} pivot={[PARTS.tail.x + PARTS.tail.w * 0.9, PARTS.tail.y + PARTS.tail.h * 0.92]} rotate={-tailSwing} z={1} />
+      <FitPart base={BASE} p={PARTS.legL} dy={-walk.liftL * k} rotate={-walk.liftL * 0.25} z={2} />
+      <FitPart base={BASE} p={PARTS.legR} dy={-walk.liftR * k} rotate={walk.liftR * 0.25} z={2} />
+      <FitPart base={BASE} p={PARTS.torso} pivot={[0, 0]} scaleY={1 + breathe} z={3} />
+      <FitPart base={BASE} p={PARTS.collar} z={4} />
+      <FitPart base={BASE} p={PARTS.armL} rotate={armL} z={5} />
       {waving ? (
-        // 인사 전용 팔: 팔꿈치를 굽혀 손을 든 그림. 어깨(왼쪽 아래)를 축으로 흔듦
-        <Part src={P("body/arm-r-wave")} w={445} h={630} x={L.shoulderR.x + 15} y={L.shoulderR.y + 40} px={0.22} py={0.9} rotate={wave(f, 10) * 10 + 15} scale={0.62} z={9} />
+        <Part src={S("body/arm-r-wave")} w={445} h={630} x={shoulderR[0] - 20} y={shoulderR[1] + 60} px={0.22} py={0.9} rotate={wave(f, 10) * 10 + 15} scale={(PARTS.armR.h / 402) * 1.2} z={9} />
       ) : (
-        <Part src={P("body/arm-r")} w={206} h={402} x={L.shoulderR.x} y={L.shoulderR.y} px={0.4} py={0.1} rotate={armR} scale={0.72} z={5} />
+        <FitPart base={BASE} p={PARTS.armR} rotate={armR} z={5} />
       )}
 
-      {/* 머리 묶음: 목이 pivot */}
-      <div
-        style={{
-          position: "absolute",
-          left: L.head.x - 325,
-          top: L.head.y - 520,
-          width: 650,
-          height: 539,
-          transformOrigin: "50% 96%",
-          transform: `rotate(${headTilt}deg)`,
-          zIndex: 6,
-        }}
-      >
-        {/* 귀·애교머리는 머리 뒤 */}
-        <Part src={P("body/ear-l")} w={230} h={247} x={150} y={110} px={0.6} py={0.85} rotate={earTwitch(1) + (emotion === "sad" || emotion === "scared" ? -25 : 0)} scale={0.9} z={0} />
-        <Part src={P("body/ear-r")} w={230} h={247} x={500} y={110} px={0.4} py={0.85} rotate={-earTwitch(2) + (emotion === "sad" || emotion === "scared" ? 25 : 0)} scale={0.9} z={0} />
-        <Part src={P("body/tuft")} w={336} h={247} x={325} y={70} px={0.5} py={0.9} rotate={wave(f, 70, seed) * 3} scale={0.58} scaleY={emotion === "surprised" ? 1.2 : 1} z={0} />
-        <Part src={P("body/head")} w={650} h={539} x={325} y={269.5} z={1} />
-
-        {/* 눈: 같은 그림을 양쪽에 (좌우 반전 없음 → 반짝이 위치 동일) */}
-        {[L.face.eyeL, L.face.eyeR].map((p, i) => (
-          <Part key={i} src={P(eyeSrc)} w={ew} h={eh} x={p.x} y={p.y} scale={FACE.eye} flipX={facing} z={2} />
-        ))}
-        {/* 눈썹: 오른쪽은 좌우 반전 (선이라 반짝이 문제 없음) */}
-        {[L.face.eyeL, L.face.eyeR].map((p, i) => (
-          <div key={i} style={{ position: "absolute", left: 0, top: 0, width: 650, height: 539, transform: i ? "scaleX(-1)" : undefined, zIndex: 2 }}>
-            <Part src={P(brow[0] as string)} w={brow[1] as number} h={brow[2] as number} x={i ? 650 - p.x : p.x} y={L.face.browY} scale={FACE.brow} />
-          </div>
-        ))}
-        {/* 코 + 입 (입은 코 아래 기준점에 붙임) */}
-        <Part src={P("face/nose")} w={107} h={59} x={L.face.nose.x} y={L.face.nose.y} scale={FACE.nose} z={4} />
-        <Part
-          src={P(`face/${mouthName}`)}
-          w={m.w}
-          h={m.h}
-          x={L.face.nose.x}
-          y={noseBottom}
-          px={m.ax / m.w}
-          py={m.ay / m.h}
-          scale={FACE.mouth}
-          z={3}
-        />
-      </div>
-
-      {/* 초커 + 마음 도토리 (코드로 그려서 색 변경) */}
-      <Part src={P("body/collar")} w={426} h={134} x={0} y={L.head.y - 10} scale={0.62} z={4} />
-      <svg width={70} height={80} viewBox="-35 -40 70 80" style={{ position: "absolute", left: -35, top: L.head.y - 2, transform: "scale(1.7)", transformOrigin: "50% 0%", zIndex: 4, overflow: "visible" }}>
+      {/* 마음 도토리 */}
+      <svg width={70} height={80} viewBox="-35 -40 70 80" style={{ position: "absolute", left: pbx + pbw / 2 - 35, top: pby + pbh * 0.36 - 40, transform: `scale(${pendScale})`, transformOrigin: "50% 50%", zIndex: 4, overflow: "visible" }}>
         <defs>
           <radialGradient id={`glow-${seed}`}>
             <stop offset="0%" stopColor={heart} stopOpacity={0.6} />
@@ -214,13 +135,27 @@ export const ToriRig: React.FC<Props> = ({
           </radialGradient>
         </defs>
         <circle cx={0} cy={6} r={42 + wave(f, 30) * 4} fill={`url(#glow-${seed})`} />
-        {/* 도토리 몸 */}
-        <path d="M-17 -6 C -19 14, -8 28, 0 32 C 8 28, 19 14, 17 -6 Z" fill={heart} stroke="#4E2313" strokeWidth={4} strokeLinejoin="round" />
-        {/* 깍지 */}
-        <path d="M-21 -4 C -21 -20, 21 -20, 21 -4 Z" fill="#8A5A35" stroke="#4E2313" strokeWidth={4} strokeLinejoin="round" />
+        <path d="M-20 -6 C -22 16, -10 30, 0 32 C 10 30, 22 16, 20 -6 Z" fill={heart} stroke="#4E2313" strokeWidth={4} strokeLinejoin="round" />
+        <path d="M-23 -3 C -23 -20, 23 -20, 23 -3 Z" fill="#8A5A35" stroke="#4E2313" strokeWidth={4} strokeLinejoin="round" />
         <path d="M0 -17 L 0 -26" stroke="#4E2313" strokeWidth={5} strokeLinecap="round" />
         <circle cx={-6} cy={6} r={4} fill="white" opacity={0.9} />
       </svg>
+
+      {/* 머리 묶음: 목이 회전 중심 */}
+      <div style={{ position: "absolute", left: 0, top: 0, width: 0, height: 0, transformOrigin: `${head.pivot[0]}px ${head.pivot[1]}px`, transform: `rotate(${headTilt}deg)`, zIndex: 6 }}>
+        <FitPart base={BASE} p={PARTS.earL} rotate={earTwitch(1) - earDrop} z={0} />
+        <FitPart base={BASE} p={PARTS.earR} rotate={-earTwitch(2) + earDrop} z={0} />
+        <FitPart base={BASE} p={PARTS.tuft} rotate={wave(f, 70, seed) * 3} scaleY={emotion === "surprised" ? 1.15 : 1} z={0} />
+        <FitPart base={BASE} p={head} z={1} />
+        {[FACE.eyeL, FACE.eyeR].map((e, i) => (
+          <Part key={i} src={S(eyeSrc)} w={ew} h={eh} x={e.x} y={e.y} scale={eyeScale} flipX={facing} z={2} />
+        ))}
+        {[FACE.eyeL, FACE.eyeR].map((e, i) => (
+          <Part key={`b${i}`} src={S(brow[0])} w={brow[1]} h={brow[2]} x={e.x} y={FACE.brow.y} scale={browScale} flipX={i ? -1 : 1} z={2} />
+        ))}
+        <Part src={S("face/nose")} w={107} h={59} x={FACE.nose.x} y={FACE.nose.y} scale={noseScale} z={4} />
+        <Part src={S(`face/${mouthName}`)} w={m.w} h={m.h} x={FACE.nose.x} y={FACE.nose.y + noseH / 2 - 4 * noseScale} px={m.ax / m.w} py={m.ay / m.h} scale={mouthScale} z={3} />
+      </div>
     </div>
   );
 };

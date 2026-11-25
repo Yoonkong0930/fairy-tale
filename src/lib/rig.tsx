@@ -71,3 +71,39 @@ export const walkCycle = (f: number, walking: boolean) => {
     liftR: walking ? Math.max(0, -stepWave) * 34 : 0,
   };
 };
+
+/** 원본에 맞춘 파츠 (scripts/fit_rig.py 가 만든 위치표의 한 항목). 좌표 = 리그 좌표(발바닥 가운데 0,0) */
+export type FitPartData = { file: string; x: number; y: number; w: number; h: number; pivot?: number[] };
+
+export const FitPart: React.FC<{
+  base: string; // "assets/characters/tori"
+  p: FitPartData;
+  pivot?: number[]; // 회전 중심 (리그 좌표). 없으면 p.pivot, 그것도 없으면 가운데
+  rotate?: number;
+  scaleX?: number;
+  scaleY?: number;
+  dx?: number;
+  dy?: number;
+  z?: number;
+  src?: string; // 다른 그림으로 바꿔 끼울 때
+}> = ({ base, p, pivot, rotate = 0, scaleX = 1, scaleY = 1, dx = 0, dy = 0, z, src }) => {
+  const pv = pivot ?? p.pivot ?? [p.x + p.w / 2, p.y + p.h / 2];
+  return (
+    <Img
+      src={src ?? staticFile(`${base}/${p.file}.png`)}
+      style={{
+        position: "absolute",
+        left: p.x + dx,
+        top: p.y + dy,
+        width: p.w,
+        height: p.h,
+        transformOrigin: `${pv[0] - p.x}px ${pv[1] - p.y}px`,
+        transform: `rotate(${rotate}deg) scale(${scaleX}, ${scaleY})`,
+        zIndex: z,
+      }}
+    />
+  );
+};
+
+/** 리그 단위를 예전 크기(키 약 1050)로 맞추는 배율 */
+export const LEGACY_HEIGHT = 1050;
