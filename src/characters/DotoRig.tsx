@@ -1,4 +1,6 @@
-import { Img, staticFile, useCurrentFrame } from "remotion";
+import { useMemo } from "react";
+import { useAudioData } from "@remotion/media-utils";
+import { Img, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { blink, wave } from "../lib/anim";
 
 /**
@@ -36,10 +38,12 @@ type PartProps = {
   rotate?: number;
   scale?: number;
   scaleY?: number;
+  /** 좌우 반전 (-1) */
+  flipX?: number;
   z?: number;
 };
 
-const Part: React.FC<PartProps> = ({ src, w, h, x, y, px = 0.5, py = 0.5, rotate = 0, scale = 1, scaleY = 1, z }) => (
+const Part: React.FC<PartProps> = ({ src, w, h, x, y, px = 0.5, py = 0.5, rotate = 0, scale = 1, scaleY = 1, flipX = 1, z }) => (
   <Img
     src={src}
     style={{
@@ -49,7 +53,7 @@ const Part: React.FC<PartProps> = ({ src, w, h, x, y, px = 0.5, py = 0.5, rotate
       left: x - w * px,
       top: y - h * py,
       transformOrigin: `${px * 100}% ${py * 100}%`,
-      transform: `rotate(${rotate}deg) scale(${scale}, ${scale * scaleY})`,
+      transform: `rotate(${rotate}deg) scale(${scale * flipX}, ${scale * scaleY})`,
       zIndex: z,
     }}
   />
@@ -85,11 +89,52 @@ type Props = {
   waving?: boolean;
   /** 깜빡임 타이밍을 캐릭터마다 다르게 */
   seed?: number;
+  /** 걷기 동작 (이동 자체는 장면에서 x를 바꿔서) */
+  walking?: boolean;
+  /** 바라보는 방향: 1 = 오른쪽, -1 = 왼쪽 (눈은 반전하지 않아 반짝이 유지) */
+  facing?: 1 | -1;
+  /** 대사 음성: 소리 크기에 맞춰 입이 움직임. from = 장면에서 음성이 시작되는 프레임 */
+  voice?: { src: string; from: number };
 };
 
-export const DotoRig: React.FC<Props> = ({ x, y, size = 0.6, emotion = "neutral", talking = false, waving = false, seed = 0 }) => {
+/** 음성 크기 → 입 크기 단계 (0 닫힘, 1 작게, 2 중간, 3 크게) */
+const useMouthLevel = (voice: Props["voice"], frame: number, fps: number) => {
+  const data = useAudioData(voice ? voice.src : staticFile("audio/silence.wav"));
+  const rmsTrack = useMemo(() => {
+    if (!voice || !data) return null;
+    const x = data.channelWaveforms[0];
+    const win = Math.floor(data.sampleRate / fps);
+    const out: number[] = [];
+    for (let i = 0; i + win <= x.length; i += win) {
+      let sum = 0;
+      for (let j = i; j < i + win; j++) sum += x[j] * x[j];
+      out.push(Math.sqrt(sum / win));
+    }
+    const peak = Math.max(...out, 1e-6);
+    return out.map((v) => v / peak);
+  }, [data, voice, fps]);
+  if (!voice || !rmsTrack) return -1; // 음성 없음
+  const i = frame - voice.from;
+  if (i < 0 || i >= rmsTrack.length) return -1;
+  // 앞뒤 프레임을 살짝 섞어서 입이 너무 떨리지 않게
+  const v = (rmsTrack[i] * 2 + (rmsTrack[i - 1] ?? 0) + (rmsTrack[i + 1] ?? 0)) / 4;
+  return v < 0.08 ? 0 : v < 0.3 ? 1 : v < 0.6 ? 2 : 3;
+};
+
+export const DotoRig: React.FC<Props> = ({
+  x, y, size = 0.6, emotion = "neutral", talking = false, waving = false, seed = 0, walking = false, facing = 1, voice,
+}) => {
   const f = useCurrentFrame();
+  const { fps } = useVideoConfig();
   const L = DOTO_LAYOUT;
+  const mouthLevel = useMouthLevel(voice, f, fps);
+
+  // 걷기: 한 걸음 = 12프레임, 다리 번갈아 들기 + 몸 통통 + 팔 흔들기
+  const step = walking ? (f % 24) / 24 : 0;
+  const stepWave = walking ? Math.sin(step * Math.PI * 2) : 0;
+  const walkBob = walking ? -Math.abs(Math.sin(step * Math.PI * 2)) * 18 : 0;
+  const legLiftL = walking ? Math.max(0, stepWave) * 34 : 0;
+  const legLiftR = walking ? Math.max(0, -stepWave) * 34 : 0;
 
   // 생명감
   const breathe = wave(f, 60, seed) * 0.012;
@@ -101,8 +146,8 @@ export const DotoRig: React.FC<Props> = ({ x, y, size = 0.6, emotion = "neutral"
   const closed = blink(f, 95, seed * 13 + 30);
 
   // 팔
-  const armL = emotion === "happy" ? -25 + wave(f, 18) * 8 : 4 + wave(f, 60, seed) * 2;
-  const armR = waving ? -138 + wave(f, 10) * 14 : emotion === "happy" ? 25 - wave(f, 18) * 8 : -4 - wave(f, 60, seed) * 2;
+  const armL = walking ? stepWave * 14 : emotion === "happy" ? -25 + wave(f, 18) * 8 : 4 + wave(f, 60, seed) * 2;
+  const armR = walking ? -stepWave * 14 : emotion === "happy" ? 25 - wave(f, 18) * 8 : -4 - wave(f, 60, seed) * 2;
 
   // 눈
   const eyeSrc =
@@ -121,9 +166,11 @@ export const DotoRig: React.FC<Props> = ({ x, y, size = 0.6, emotion = "neutral"
 
   // 입 (talking이면 크기 3단계를 번갈아)
   const talkFrames = ["mouth-talk-s", "mouth-talk-m", "mouth-talk-l", "mouth-talk-m"];
-  const mouthName = talking
-    ? talkFrames[Math.floor(f / 4) % talkFrames.length]
-    : ({ neutral: "mouth-neutral", happy: "mouth-happy", angry: "mouth-angry", sad: "mouth-sad", scared: "mouth-angry", surprised: "mouth-o" } as const)[emotion];
+  const emotionMouth = ({ neutral: "mouth-neutral", happy: "mouth-happy", angry: "mouth-angry", sad: "mouth-sad", scared: "mouth-angry", surprised: "mouth-o" } as const)[emotion];
+  const voiceMouths: string[] = ["mouth-neutral", "mouth-talk-s", "mouth-talk-m", "mouth-talk-l"];
+  let mouthName: string = emotionMouth;
+  if (mouthLevel > 0) mouthName = voiceMouths[mouthLevel];
+  else if (mouthLevel < 0 && talking) mouthName = talkFrames[Math.floor(f / 4) % talkFrames.length];
   const MOUTH: Record<string, { w: number; h: number; ax: number; ay: number }> = {
     "mouth-neutral": { w: 224, h: 86, ax: 109.5, ay: -1 },
     "mouth-happy": { w: 257, h: 219, ax: 125.5, ay: -1 },
@@ -146,10 +193,10 @@ export const DotoRig: React.FC<Props> = ({ x, y, size = 0.6, emotion = "neutral"
       style={{
         position: "absolute",
         left: x + shiver,
-        top: y + hop,
+        top: y + hop + walkBob,
         width: 0,
         height: 0,
-        transform: `scale(${size})`,
+        transform: `scale(${size * facing}, ${size})`,
         transformOrigin: "0 0",
       }}
     >
@@ -157,15 +204,20 @@ export const DotoRig: React.FC<Props> = ({ x, y, size = 0.6, emotion = "neutral"
       <Part src={P("body/tail")} w={467} h={435} x={L.tail.x} y={L.tail.y} px={0.12} py={0.88} rotate={tailSwing} z={1} />
 
       {/* 다리 */}
-      <Part src={P("body/leg-l")} w={256} h={365} x={L.legL.x} y={L.legL.y} px={0.5} py={1} z={2} />
-      <Part src={P("body/leg-r")} w={256} h={365} x={L.legR.x} y={L.legR.y} px={0.5} py={1} z={2} />
+      <Part src={P("body/leg-l")} w={256} h={365} x={L.legL.x} y={L.legL.y - legLiftL} px={0.5} py={1} rotate={-legLiftL * 0.25} z={2} />
+      <Part src={P("body/leg-r")} w={256} h={365} x={L.legR.x} y={L.legR.y - legLiftR} px={0.5} py={1} rotate={legLiftR * 0.25} z={2} />
 
       {/* 몸통: 아래 끝 기준으로 숨쉬기 */}
       <Part src={P("body/torso")} w={451} h={451} x={L.torso.x} y={L.torso.y} px={0.5} py={1} scaleY={1 + breathe} z={3} />
 
       {/* 팔: 어깨가 pivot */}
       <Part src={P("body/arm-l")} w={207} h={402} x={L.shoulderL.x} y={L.shoulderL.y} px={0.6} py={0.1} rotate={armL} scale={0.72} z={5} />
-      <Part src={P("body/arm-r")} w={206} h={402} x={L.shoulderR.x} y={L.shoulderR.y} px={0.4} py={0.1} rotate={armR} scale={0.72} z={waving ? 9 : 5} />
+      {waving ? (
+        // 인사 전용 팔: 팔꿈치를 굽혀 손을 든 그림. 어깨(왼쪽 아래)를 축으로 흔듦
+        <Part src={P("body/arm-r-wave")} w={445} h={630} x={L.shoulderR.x + 15} y={L.shoulderR.y + 40} px={0.22} py={0.9} rotate={wave(f, 10) * 10 + 15} scale={0.62} z={9} />
+      ) : (
+        <Part src={P("body/arm-r")} w={206} h={402} x={L.shoulderR.x} y={L.shoulderR.y} px={0.4} py={0.1} rotate={armR} scale={0.72} z={5} />
+      )}
 
       {/* 머리 묶음: 목이 pivot */}
       <div
@@ -183,12 +235,12 @@ export const DotoRig: React.FC<Props> = ({ x, y, size = 0.6, emotion = "neutral"
         {/* 귀·애교머리는 머리 뒤 */}
         <Part src={P("body/ear-l")} w={230} h={247} x={150} y={110} px={0.6} py={0.85} rotate={earTwitch(1) + (emotion === "sad" || emotion === "scared" ? -25 : 0)} scale={0.9} z={0} />
         <Part src={P("body/ear-r")} w={230} h={247} x={500} y={110} px={0.4} py={0.85} rotate={-earTwitch(2) + (emotion === "sad" || emotion === "scared" ? 25 : 0)} scale={0.9} z={0} />
-        <Part src={P("body/tuft")} w={336} h={247} x={325} y={75} px={0.5} py={0.9} rotate={wave(f, 70, seed) * 3} scale={0.8} scaleY={emotion === "surprised" ? 1.2 : 1} z={0} />
+        <Part src={P("body/tuft")} w={336} h={247} x={325} y={70} px={0.5} py={0.9} rotate={wave(f, 70, seed) * 3} scale={0.58} scaleY={emotion === "surprised" ? 1.2 : 1} z={0} />
         <Part src={P("body/head")} w={650} h={539} x={325} y={269.5} z={1} />
 
         {/* 눈: 같은 그림을 양쪽에 (좌우 반전 없음 → 반짝이 위치 동일) */}
         {[L.face.eyeL, L.face.eyeR].map((p, i) => (
-          <Part key={i} src={P(eyeSrc)} w={ew} h={eh} x={p.x} y={p.y} scale={FACE.eye} z={2} />
+          <Part key={i} src={P(eyeSrc)} w={ew} h={eh} x={p.x} y={p.y} scale={FACE.eye} flipX={facing} z={2} />
         ))}
         {/* 눈썹: 오른쪽은 좌우 반전 (선이라 반짝이 문제 없음) */}
         {[L.face.eyeL, L.face.eyeR].map((p, i) => (
@@ -212,8 +264,8 @@ export const DotoRig: React.FC<Props> = ({ x, y, size = 0.6, emotion = "neutral"
       </div>
 
       {/* 초커 + 마음 도토리 (코드로 그려서 색 변경) */}
-      <Part src={P("body/collar")} w={426} h={134} x={0} y={L.head.y - 10} scale={0.62} z={7} />
-      <svg width={70} height={80} viewBox="-35 -40 70 80" style={{ position: "absolute", left: -35, top: L.head.y - 2, transform: "scale(1.7)", transformOrigin: "50% 0%", zIndex: 8, overflow: "visible" }}>
+      <Part src={P("body/collar")} w={426} h={134} x={0} y={L.head.y - 10} scale={0.62} z={4} />
+      <svg width={70} height={80} viewBox="-35 -40 70 80" style={{ position: "absolute", left: -35, top: L.head.y - 2, transform: "scale(1.7)", transformOrigin: "50% 0%", zIndex: 4, overflow: "visible" }}>
         <defs>
           <radialGradient id={`glow-${seed}`}>
             <stop offset="0%" stopColor={heart} stopOpacity={0.6} />

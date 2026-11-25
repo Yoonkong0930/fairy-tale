@@ -1,6 +1,7 @@
 import { Composition } from "remotion";
 import { TestScene } from "./scenes/TestScene";
 import { RigTest } from "./scenes/RigTest";
+import { DotoDemo } from "./scenes/DotoDemo";
 import { FPS, HEIGHT, WIDTH } from "./lib/video";
 
 export const RemotionRoot: React.FC = () => {
@@ -17,6 +18,8 @@ export const RemotionRoot: React.FC = () => {
       />
       {/* 진짜 도토 리그 확인: 감정 6종(각 2초) → 말하기 → 손 흔들기 */}
       <Composition id="RigTest" component={RigTest} durationInFrames={FPS * 18} fps={FPS} width={WIDTH} height={HEIGHT} />
+      {/* 걷기 + 인사 + 음성 입모양 데모 */}
+      <Composition id="DotoDemo" component={DotoDemo} durationInFrames={FPS * 19} fps={FPS} width={WIDTH} height={HEIGHT} />
     </>
   );
 };
