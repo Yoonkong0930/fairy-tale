@@ -1,0 +1,253 @@
+{
+ "canvas": [
+  1024,
+  1024
+ ],
+ "source": "art/v2/tori/original.png",
+ "masks": "art/v2/tori/step2-masks",
+ "draw_order_back_to_front": [
+  "tail",
+  "legL",
+  "legR",
+  "torso",
+  "pendant",
+  "armL",
+  "armR",
+  "earL",
+  "earR",
+  "head",
+  "tuft"
+ ],
+ "layers": {
+  "tail": {
+   "z": 0,
+   "file": "tail.png",
+   "bbox": [
+    680,
+    563,
+    939,
+    880
+   ],
+   "area_px": 48682,
+   "outer_edge_px": 2666,
+   "soft_alpha_px": 2326,
+   "internal_boundary_alpha_min": 255,
+   "why": "behind everything: its left edge disappears behind the torso and the right arm's silhouette is drawn over it (only a small stripe wedge shows between arm and body)."
+  },
+  "legL": {
+   "z": 1,
+   "file": "legL.png",
+   "bbox": [
+    346,
+    883,
+    471,
+    974
+   ],
+   "area_px": 8358,
+   "outer_edge_px": 847,
+   "soft_alpha_px": 823,
+   "internal_boundary_alpha_min": 255,
+   "why": "behind torso: the crotch/hip shading band that caps the legs belongs to the torso, so the torso's lower edge covers the hip joint when the legs rotate."
+  },
+  "legR": {
+   "z": 2,
+   "file": "legR.png",
+   "bbox": [
+    555,
+    883,
+    678,
+    974
+   ],
+   "area_px": 8294,
+   "outer_edge_px": 840,
+   "soft_alpha_px": 816,
+   "internal_boundary_alpha_min": 255,
+   "why": "same as legL."
+  },
+  "torso": {
+   "z": 3,
+   "file": "torso.png",
+   "bbox": [
+    325,
+    614,
+    692,
+    920
+   ],
+   "area_px": 82875,
+   "outer_edge_px": 860,
+   "soft_alpha_px": 815,
+   "internal_boundary_alpha_min": 255,
+   "why": "body incl. collar; drawn over tail and legs, under arms, pendant and head."
+  },
+  "pendant": {
+   "z": 4,
+   "file": "pendant.png",
+   "bbox": [
+    471,
+    660,
+    553,
+    771
+   ],
+   "area_px": 6072,
+   "outer_edge_px": 0,
+   "soft_alpha_px": 0,
+   "internal_boundary_alpha_min": 255,
+   "why": "hangs on the collar/belly: in front of the torso (sits in the torso's hole)."
+  },
+  "armL": {
+   "z": 5,
+   "file": "armL.png",
+   "bbox": [
+    255,
+    637,
+    375,
+    812
+   ],
+   "area_px": 11216,
+   "outer_edge_px": 1047,
+   "soft_alpha_px": 1027,
+   "internal_boundary_alpha_min": 255,
+   "why": "the inner-arm shading wedge lies on top of the belly edge -> arms in front of torso."
+  },
+  "armR": {
+   "z": 6,
+   "file": "armR.png",
+   "bbox": [
+    650,
+    638,
+    767,
+    809
+   ],
+   "area_px": 10573,
+   "outer_edge_px": 107,
+   "soft_alpha_px": 99,
+   "internal_boundary_alpha_min": 255,
+   "why": "in front of torso and of the tail (arm silhouette overlaps the tail)."
+  },
+  "earL": {
+   "z": 7,
+   "file": "earL.png",
+   "bbox": [
+    287,
+    121,
+    394,
+    235
+   ],
+   "area_px": 8199,
+   "outer_edge_px": 924,
+   "soft_alpha_px": 924,
+   "internal_boundary_alpha_min": 255,
+   "why": "behind head: the head's round outline passes over the ear bases."
+  },
+  "earR": {
+   "z": 8,
+   "file": "earR.png",
+   "bbox": [
+    630,
+    121,
+    737,
+    234
+   ],
+   "area_px": 8127,
+   "outer_edge_px": 915,
+   "soft_alpha_px": 911,
+   "internal_boundary_alpha_min": 255,
+   "why": "same as earL."
+  },
+  "head": {
+   "z": 9,
+   "file": "head.png",
+   "bbox": [
+    219,
+    155,
+    805,
+    639
+   ],
+   "area_px": 220264,
+   "outer_edge_px": 3991,
+   "soft_alpha_px": 3795,
+   "internal_boundary_alpha_min": 255,
+   "why": "head's lower band overlaps the collar and the arm tops -> in front of torso/arms."
+  },
+  "tuft": {
+   "z": 10,
+   "file": "tuft.png",
+   "bbox": [
+    428,
+    69,
+    585,
+    166
+   ],
+   "area_px": 10126,
+   "outer_edge_px": 1198,
+   "soft_alpha_px": 1126,
+   "internal_boundary_alpha_min": 255,
+   "why": "in front of head: the tuft blobs' rounded bottoms and their soft shading are drawn over the head's top silhouette and over the head stripes."
+  }
+ },
+ "edge_alpha": {
+  "method": "outer silhouette band (<= 3 px from background through the same part) de-whited: alpha = projection of (white-C) on (white-S), S = local core colour, clamped to [a_min,1]; colour un-premultiplied. Internal part/part boundaries alpha 255."
+ },
+ "glow_removal": {
+  "glow_color_M": [
+   149.8,
+   240.0,
+   193.5
+  ],
+  "region_clean_colors": {
+   "cream": [
+    251.0,
+    243.0,
+    220.0
+   ],
+   "beige": [
+    234.0,
+    202.0,
+    172.0
+   ],
+   "collar_light": [
+    158.0,
+    114.0,
+    80.0
+   ],
+   "collar_dark": [
+    139.0,
+    91.0,
+    60.0
+   ],
+   "tan": [
+    236.0,
+    191.0,
+    131.0
+   ]
+  },
+  "fitted_px": 28716,
+  "zone_px": 31171,
+  "t_max": 0.662,
+  "changed_px": 19246,
+  "changed_px_diff_gt_2": 16872,
+  "acorn_ring_px": 1226,
+  "envelope_px_from_acorn": [
+   50.0,
+   70.0
+  ]
+ },
+ "recomposite_white_vs_original": {
+  "all_px": {
+   "max": 136,
+   "mean": 0.28
+  },
+  "excluding_glow_change": {
+   "max": 9,
+   "mean": 0.0849,
+   "px_diff_gt_0": 80887,
+   "px_diff_gt_2": 7150,
+   "max_inside_fg_away_from_edges": 0,
+   "max_in_background": 9,
+   "max_on_soft_edge": 0
+  },
+  "glow_changed_px": 19246,
+  "glow_area_mean_diff": 10.72,
+  "glow_area_max_diff": 136
+ }
+}
