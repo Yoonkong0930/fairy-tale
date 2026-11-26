@@ -1,0 +1,393 @@
+{
+ "source": "art/v2/tori/original.png",
+ "canvas": [
+  1024,
+  1024
+ ],
+ "foreground_px": 422786,
+ "partition_check": {
+  "overlap_px": 0,
+  "unassigned_fg_px": 0,
+  "mask_px_in_background": 0
+ },
+ "ai_guides": {
+  "ai_no_tail": {
+   "iou": 0.9928,
+   "meandiff": 1.27
+  },
+  "ai_tail_only": {
+   "inside_tail_meandiff": 4.39
+  },
+  "ai_no_ears": {
+   "iou": 1.0,
+   "meandiff": 1.21
+  }
+ },
+ "arm_cuts_xy": {
+  "L": [
+   [
+    395.9,
+    600
+   ],
+   [
+    392.0,
+    610
+   ],
+   [
+    388.2,
+    620
+   ],
+   [
+    384.3,
+    630
+   ],
+   [
+    380.4,
+    640
+   ],
+   [
+    376.5,
+    650
+   ],
+   [
+    372.6,
+    660
+   ],
+   [
+    368.7,
+    670
+   ],
+   [
+    364.8,
+    680
+   ],
+   [
+    360.9,
+    690
+   ],
+   [
+    357.5,
+    700
+   ],
+   [
+    353.5,
+    710
+   ],
+   [
+    349.5,
+    720
+   ],
+   [
+    345.5,
+    730
+   ],
+   [
+    342.5,
+    740
+   ],
+   [
+    339.5,
+    750
+   ],
+   [
+    337.5,
+    760
+   ],
+   [
+    334.5,
+    770
+   ],
+   [
+    333.5,
+    780
+   ],
+   [
+    325.7,
+    790
+   ],
+   [
+    324.0,
+    800
+   ],
+   [
+    324.0,
+    810
+   ]
+  ],
+  "R": [
+   [
+    626.7,
+    600
+   ],
+   [
+    630.6,
+    610
+   ],
+   [
+    634.6,
+    620
+   ],
+   [
+    638.5,
+    630
+   ],
+   [
+    642.5,
+    640
+   ],
+   [
+    646.4,
+    650
+   ],
+   [
+    650.3,
+    660
+   ],
+   [
+    654.3,
+    670
+   ],
+   [
+    658.2,
+    680
+   ],
+   [
+    662.1,
+    690
+   ],
+   [
+    665.5,
+    700
+   ],
+   [
+    669.5,
+    710
+   ],
+   [
+    673.5,
+    720
+   ],
+   [
+    677.5,
+    730
+   ],
+   [
+    680.5,
+    740
+   ],
+   [
+    683.5,
+    750
+   ],
+   [
+    686.5,
+    760
+   ],
+   [
+    688.5,
+    770
+   ],
+   [
+    689.5,
+    780
+   ],
+   [
+    692.0,
+    790
+   ],
+   [
+    692.0,
+    800
+   ],
+   [
+    692.0,
+    810
+   ]
+  ]
+ },
+ "leg_polys": {
+  "legL": [
+   [
+    300,
+    880
+   ],
+   [
+    421,
+    887
+   ],
+   [
+    447,
+    894
+   ],
+   [
+    470,
+    900
+   ],
+   [
+    469,
+    918
+   ],
+   [
+    462,
+    1010
+   ],
+   [
+    300,
+    1010
+   ]
+  ],
+  "legR": [
+   [
+    724,
+    880
+   ],
+   [
+    604,
+    887
+   ],
+   [
+    578,
+    894
+   ],
+   [
+    556,
+    900
+   ],
+   [
+    556,
+    918
+   ],
+   [
+    566,
+    1010
+   ],
+   [
+    724,
+    1010
+   ]
+  ]
+ },
+ "parts": {
+  "head": {
+   "bbox": [
+    219,
+    155,
+    805,
+    639
+   ],
+   "area": 220264,
+   "components": 1,
+   "note": "Face/head disc incl. stripes, cheeks and pinkish bottom band; bottom = colour edge of the band vs collar brown / background / tail; top/ear junctions = AI-continued head outline (ai_no_ears)."
+  },
+  "tuft": {
+   "bbox": [
+    428,
+    69,
+    585,
+    166
+   ],
+   "area": 10126,
+   "components": 1,
+   "note": "Cowlick blobs protruding above the AI-continued head outline + their soft lower-blob shading over the head; head stripes stay head. Merge into head if a separate tuft is not wanted."
+  },
+  "earL": {
+   "bbox": [
+    287,
+    121,
+    394,
+    235
+   ],
+   "area": 8199,
+   "components": 1,
+   "note": "Viewer-left ear: original pixels outside the head outline continued by ai_no_ears (cut runs notch-to-notch along the head arc)."
+  },
+  "earR": {
+   "bbox": [
+    630,
+    121,
+    737,
+    234
+   ],
+   "area": 8127,
+   "components": 1,
+   "note": "Viewer-right ear: same rule as earL."
+  },
+  "torso": {
+   "bbox": [
+    325,
+    614,
+    692,
+    920
+   ],
+   "area": 82875,
+   "components": 1,
+   "note": "Body incl. collar band, collar shadow over chest, belly, pendant glow, crotch shading band; bounded by arm wedge edges, hip cuts, tail mask."
+  },
+  "pendant": {
+   "bbox": [
+    471,
+    660,
+    553,
+    771
+   ],
+   "area": 6072,
+   "components": 1,
+   "note": "Acorn only (olive cap+stem, green nut, highlights) by colour in pendant window, holes filled; glow stays torso."
+  },
+  "armL": {
+   "bbox": [
+    255,
+    637,
+    375,
+    812
+   ],
+   "area": 11216,
+   "components": 1,
+   "note": "Torso-side edge of the dark inner-arm shading wedge (measured per row), continued straight up to the collar; collar brown excluded, shoulder collar-shadow included."
+  },
+  "armR": {
+   "bbox": [
+    650,
+    638,
+    767,
+    809
+   ],
+   "area": 10573,
+   "components": 1,
+   "note": "Mirror of armL; separated from the tail by the AI tail mask (arm keeps its underside shading band, as in ai_no_tail)."
+  },
+  "legL": {
+   "bbox": [
+    346,
+    883,
+    471,
+    974
+   ],
+   "area": 8358,
+   "components": 1,
+   "note": "Hip cut: line from outer silhouette (y=880) to inner-thigh shading tip (421,887), along shading top edge to the leg gap (470,900), then down the gap edge."
+  },
+  "legR": {
+   "bbox": [
+    555,
+    883,
+    678,
+    974
+   ],
+   "area": 8294,
+   "components": 1,
+   "note": "Mirror of legL: (604,887) -> (556,900) -> gap edge; right outer side bounded by the tail mask."
+  },
+  "tail": {
+   "bbox": [
+    680,
+    563,
+    939,
+    880
+   ],
+   "area": 48682,
+   "components": 1,
+   "note": "Pixels changed by ai_no_tail AND non-green in ai_tail_only; includes the small dark stripe triangle visible between right arm and torso (joined to the main tail by its shading)."
+  }
+ }
+}
