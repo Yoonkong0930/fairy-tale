@@ -1,0 +1,77 @@
+{
+ "white": {
+  "rig_render_from_crops_vs_final_full_layers": {
+   "max": 0,
+   "px_diff": 0
+  },
+  "vs_step4_rest(main stack)": {
+   "outside_tuft_area": {
+    "max": 2,
+    "px_diff": 1,
+    "px_diff_gt2": 0
+   },
+   "inside_tuft_area": {
+    "px": 10158,
+    "px_diff": 10158,
+    "max": 99
+   }
+  },
+  "vs_step4_rest(optional stack)": {
+   "outside_tuft_area": {
+    "max": 2,
+    "px_diff": 1,
+    "px_diff_gt2": 0
+   }
+  }
+ },
+ "green": {
+  "rig_render_from_crops_vs_final_full_layers": {
+   "max": 0,
+   "px_diff": 0
+  },
+  "vs_step4_rest(main stack)": {
+   "outside_tuft_area": {
+    "max": 2,
+    "px_diff": 1,
+    "px_diff_gt2": 0
+   },
+   "inside_tuft_area": {
+    "px": 10158,
+    "px_diff": 10158,
+    "max": 99
+   }
+  },
+  "vs_step4_rest(optional stack)": {
+   "outside_tuft_area": {
+    "max": 2,
+    "px_diff": 1,
+    "px_diff_gt2": 0
+   }
+  }
+ },
+ "dark": {
+  "rig_render_from_crops_vs_final_full_layers": {
+   "max": 0,
+   "px_diff": 0
+  },
+  "vs_step4_rest(main stack)": {
+   "outside_tuft_area": {
+    "max": 2,
+    "px_diff": 1,
+    "px_diff_gt2": 0
+   },
+   "inside_tuft_area": {
+    "px": 10158,
+    "px_diff": 10158,
+    "max": 99
+   }
+  },
+  "vs_step4_rest(optional stack)": {
+   "outside_tuft_area": {
+    "max": 2,
+    "px_diff": 1,
+    "px_diff_gt2": 0
+   }
+  }
+ }
+}
