@@ -1,0 +1,106 @@
+{
+ "base": "art/v2/tori/views/34-original.png",
+ "donor": "art/v2/tori/views/34-cand4.png",
+ "notches_base_cand3": [
+  [
+   631.0,
+   178.0
+  ],
+  [
+   704.0,
+   232.0
+  ]
+ ],
+ "notches_donor_cand4": [
+  [
+   620.0,
+   173.0
+  ],
+  [
+   696.0,
+   223.0
+  ]
+ ],
+ "ear_transform_donor_to_base": {
+  "rule": "maps cand4's ear/head notch chord onto cand3's ear/head notch chord",
+  "scale": 0.9981,
+  "rot_deg": 3.151,
+  "translation_at_ear_centre": [
+   10.75,
+   7.19
+  ]
+ },
+ "head_registration_check": {
+  "scale": 0.9901,
+  "rot_deg": 0.132,
+  "shift": [
+   2.19,
+   1.81
+  ],
+  "mean_abs_err": 3.93,
+  "mean_abs_err_identity": 4.83
+ },
+ "ear_transform_vs_head_registration_at_ear_centre_px": 9.62,
+ "base_outline_cubic": {
+  "coef": [
+   5.621455722511363e-06,
+   -0.006941772503503276,
+   2.5021551458997107,
+   -48.16428978285431
+  ],
+  "n_left": 20,
+  "n_cut": 27,
+  "n_right": 14,
+  "cut_x": [
+   658.0,
+   684.0
+  ],
+  "rms": 0.32,
+  "max_abs": 0.92
+ },
+ "donor_arc_mapped_vs_base_outline_px": {
+  "mean": -0.21,
+  "max_abs": 0.65
+ },
+ "palette": {
+  "cand3_inner_ear": [
+   209.0,
+   155.0,
+   108.0
+  ],
+  "cand4_far_ear_main": [
+   208.0,
+   154.0,
+   106.0
+  ],
+  "shift_applied": [
+   1.0,
+   1.0,
+   2.0
+  ],
+  "cand3_tan": [
+   234.0,
+   190.0,
+   129.0
+  ],
+  "cand4_tan": [
+   234.0,
+   189.0,
+   128.0
+  ]
+ },
+ "donor_ear_layer": {
+  "visible_px": 6298,
+  "pure_px": 5475,
+  "hidden_fill_px": 2293
+ },
+ "changed_px": 8586,
+ "changed_bbox": [
+  618,
+  117,
+  738,
+  245
+ ],
+ "changed_outside_window": 0,
+ "inner_ear_colour_px_left_inside_head": 3
+}

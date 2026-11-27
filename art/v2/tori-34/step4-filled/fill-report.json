@@ -1,0 +1,584 @@
+{
+ "source": "art/v2/tori-34/step3-layers",
+ "canvas": [
+  1024,
+  1024
+ ],
+ "draw_order_back_to_front": [
+  "tail",
+  "legFar",
+  "legNear",
+  "armFar",
+  "torso",
+  "pendant",
+  "armNear",
+  "collar_front",
+  "earFar",
+  "earNear",
+  "head",
+  "tuft"
+ ],
+ "rule": "pixels are added only where the part is transparent in step 3 and some layer in front of it is fully opaque (alpha 255) -> invisible in the rest pose",
+ "collar_front": "byte copies of the torso's opaque collar px with x < 470 (near shoulder), drawn above armNear (front lesson); 3104 px",
+ "parts": {
+  "tail": {
+   "added_px": 13718,
+   "added_bbox": [
+    296,
+    680,
+    400,
+    883
+   ],
+   "method": [
+    "EXCEPTION seam un-mix vs armNear: 94 visible boundary px set to the clean local colour (their AA moved into armNear as a soft edge)",
+    "EXCEPTION seam un-mix vs torso: 4 visible boundary px set to the clean local colour (their AA moved into torso as a soft edge)",
+    "tail stem behind the near arm + root 40 px behind the torso's near side: convex hull of the visible stem pieces around the arm; bands by harmonic ORDINAL field (outer orange < dark stripe < inner orange < cream, as front) so the dark stripe left of the arm joins the dark sliver under the hand [13718 px]"
+   ],
+   "visible_px_changed": 98,
+   "visible_px_changed_outside_listed_exceptions": 0,
+   "hidden_check_added_px_not_fully_covered": 0
+  },
+  "legFar": {
+   "added_px": 6127,
+   "added_bbox": [
+    558,
+    841,
+    684,
+    915
+   ],
+   "method": [
+    "EXCEPTION seam un-mix vs torso: 8 visible boundary px set to the clean local colour (their AA moved into torso as a soft edge)",
+    "hip end: visible leg sides continued straight up and closed by a half-ellipse cap (center 620,881, a=63, b=40) under the torso; tan / shading carried up column-wise [6127 px]"
+   ],
+   "visible_px_changed": 8,
+   "visible_px_changed_outside_listed_exceptions": 0,
+   "hidden_check_added_px_not_fully_covered": 0
+  },
+  "legNear": {
+   "added_px": 5971,
+   "added_bbox": [
+    378,
+    853,
+    512,
+    919
+   ],
+   "method": [
+    "EXCEPTION seam un-mix vs torso: 1 visible boundary px set to the clean local colour (their AA moved into torso as a soft edge)",
+    "hip end: visible leg sides continued straight up and closed by a half-ellipse cap (center 444,893, a=67, b=40) under the torso; tan / shading carried up column-wise [5971 px]"
+   ],
+   "visible_px_changed": 1,
+   "visible_px_changed_outside_listed_exceptions": 0,
+   "hidden_check_added_px_not_fully_covered": 0
+  },
+  "armFar": {
+   "added_px": 2837,
+   "added_bbox": [
+    648,
+    624,
+    700,
+    796
+   ],
+   "method": [
+    "EXCEPTION seam un-mix vs torso: 31 visible boundary px set to the clean local colour (their AA moved into torso as a soft edge)",
+    "far arm (behind the torso): 16 px band behind the torso along its inner cut and over its top edge (under collar / head), distance-field silhouette with ~1 px AA; inner shading stripe / tan continued by harmonic SDF [2837 px]"
+   ],
+   "visible_px_changed": 31,
+   "visible_px_changed_outside_listed_exceptions": 0,
+   "hidden_check_added_px_not_fully_covered": 0
+  },
+  "torso": {
+   "added_px": 30816,
+   "added_bbox": [
+    362,
+    561,
+    676,
+    826
+   ],
+   "method": [
+    "pendant hole: collar / beige / cream band boundaries continued across the hole (harmonic SDF), flat region colours, 4x4 AA [5913 px]",
+    "under armNear: torso near side continued as a quadratic from the collar's left end (377,648) to the visible side below the arm (362.0,834, vertical tangent); collar-shadow / tan regions by harmonic SDF [8550 px]",
+    "under the head: collar band carried straight up column-wise to collar top = fitted collar bottom - 54 px; tan neck (40 px, inset 12, rounded) [16353 px]",
+    "EXCEPTION seam un-mix vs head: 125 visible boundary px set to the clean local colour (their AA moved into head as a soft edge)",
+    "EXCEPTION seam un-mix over tail: 4 soft edge px added (AA taken from tail's boundary row; rest pose unchanged)",
+    "EXCEPTION seam un-mix vs armNear: 77 visible boundary px set to the clean local colour (their AA moved into armNear as a soft edge)",
+    "EXCEPTION seam un-mix over armFar: 31 soft edge px added (AA taken from armFar's boundary row; rest pose unchanged)",
+    "EXCEPTION seam un-mix over legNear: 1 soft edge px added (AA taken from legNear's boundary row; rest pose unchanged)",
+    "EXCEPTION seam un-mix over legFar: 8 soft edge px added (AA taken from legFar's boundary row; rest pose unchanged)",
+    "EXCEPTION seam un-mix vs pendant: 168 visible boundary px set to the clean local colour (their AA moved into pendant as a soft edge)"
+   ],
+   "visible_px_changed": 406,
+   "visible_px_changed_outside_listed_exceptions": 0,
+   "hidden_check_added_px_not_fully_covered": 0
+  },
+  "pendant": {
+   "added_px": 0,
+   "added_bbox": null,
+   "method": [
+    "EXCEPTION seam un-mix over torso: 168 soft edge px added (AA taken from torso's boundary row; rest pose unchanged)"
+   ],
+   "visible_px_changed": 0,
+   "visible_px_changed_outside_listed_exceptions": 0,
+   "hidden_check_added_px_not_fully_covered": 0
+  },
+  "armNear": {
+   "added_px": 1407,
+   "added_bbox": [
+    376,
+    628,
+    443,
+    666
+   ],
+   "method": [
+    "EXCEPTION seam un-mix over tail: 94 soft edge px added (AA taken from tail's boundary row; rest pose unchanged)",
+    "EXCEPTION seam un-mix over torso: 77 soft edge px added (AA taken from torso's boundary row; rest pose unchanged)",
+    "near arm: rounded shoulder end (half-ellipse, half-width 36, depth 22) on its top edge, only under collar_front / head; colours by harmonic SDF [1407 px]"
+   ],
+   "visible_px_changed": 0,
+   "visible_px_changed_outside_listed_exceptions": 0,
+   "hidden_check_added_px_not_fully_covered": 0
+  },
+  "collar_front": {
+   "added_px": 0,
+   "added_bbox": null,
+   "method": [
+    "nothing hidden to fill -> copied unchanged"
+   ],
+   "visible_px_changed": 0,
+   "visible_px_changed_outside_listed_exceptions": 0,
+   "hidden_check_added_px_not_fully_covered": 0
+  },
+  "earFar": {
+   "added_px": 1751,
+   "added_bbox": [
+    632,
+    180,
+    700,
+    237
+   ],
+   "method": [
+    "EXCEPTION seam un-mix vs head: 25 visible boundary px set to the clean local colour (their AA moved into head as a soft edge)",
+    "far ear disc completed behind the head: ellipse fitted to the visible silhouette (away from the head); main / crescent tone by harmonic SDF; 4x4 AA [1751 px]"
+   ],
+   "visible_px_changed": 25,
+   "visible_px_changed_outside_listed_exceptions": 0,
+   "hidden_check_added_px_not_fully_covered": 0
+  },
+  "earNear": {
+   "added_px": 1634,
+   "added_bbox": [
+    319,
+    181,
+    397,
+    246
+   ],
+   "method": [
+    "EXCEPTION seam un-mix vs head: 48 visible boundary px set to the clean local colour (their AA moved into head as a soft edge)",
+    "ear bottom completed behind the head: ellipse fitted to the visible ear silhouette (away from the head) and ellipse fitted to the visible inner-ear boundary; 4x4 supersampled AA edge [1634 px]"
+   ],
+   "visible_px_changed": 48,
+   "visible_px_changed_outside_listed_exceptions": 0,
+   "hidden_check_added_px_not_fully_covered": 0
+  },
+  "head": {
+   "added_px": 542,
+   "added_bbox": [
+    438,
+    153,
+    559,
+    167
+   ],
+   "method": [
+    "EXCEPTION seam un-mix over torso: 125 soft edge px added (AA taken from torso's boundary row; rest pose unchanged)",
+    "EXCEPTION seam un-mix vs tuft: 21 visible boundary px set to the clean local colour (their AA moved into tuft as a soft edge)",
+    "EXCEPTION seam un-mix over earNear: 48 soft edge px added (AA taken from earNear's boundary row; rest pose unchanged)",
+    "EXCEPTION seam un-mix over earFar: 25 soft edge px added (AA taken from earFar's boundary row; rest pose unchanged)",
+    "head top under the tuft: circle fitted to the visible head top left/right of the tuft (c=(516.2,408.2), r=255.7); stripes run on by harmonic SDF [542 px]"
+   ],
+   "visible_px_changed": 21,
+   "visible_px_changed_outside_listed_exceptions": 0,
+   "hidden_check_added_px_not_fully_covered": 0
+  },
+  "tuft": {
+   "added_px": 0,
+   "added_bbox": null,
+   "method": [
+    "EXCEPTION seam un-mix over head: 21 soft edge px added (AA taken from head's boundary row; rest pose unchanged)"
+   ],
+   "visible_px_changed": 0,
+   "visible_px_changed_outside_listed_exceptions": 0,
+   "hidden_check_added_px_not_fully_covered": 0
+  }
+ },
+ "exceptions": {
+  "torso|head": {
+   "back_visible_px_recoloured": 125,
+   "front_soft_edge_px_added": 125,
+   "bbox": [
+    378,
+    616,
+    673,
+    640
+   ],
+   "unmix_residual_max": 0.34
+  },
+  "tail|armNear": {
+   "back_visible_px_recoloured": 94,
+   "front_soft_edge_px_added": 94,
+   "bbox": [
+    295,
+    685,
+    361,
+    821
+   ],
+   "unmix_residual_max": 0.89
+  },
+  "tail|torso": {
+   "back_visible_px_recoloured": 4,
+   "front_soft_edge_px_added": 4,
+   "bbox": [
+    363,
+    840,
+    367,
+    859
+   ],
+   "unmix_residual_max": 0.32
+  },
+  "head|tuft": {
+   "back_visible_px_recoloured": 21,
+   "front_soft_edge_px_added": 21,
+   "bbox": [
+    448,
+    157,
+    553,
+    165
+   ],
+   "unmix_residual_max": 0.93
+  },
+  "earNear|head": {
+   "back_visible_px_recoloured": 48,
+   "front_soft_edge_px_added": 48,
+   "bbox": [
+    336,
+    191,
+    377,
+    227
+   ],
+   "unmix_residual_max": 0.39
+  },
+  "earFar|head": {
+   "back_visible_px_recoloured": 25,
+   "front_soft_edge_px_added": 25,
+   "bbox": [
+    633,
+    180,
+    692,
+    222
+   ],
+   "unmix_residual_max": 0.46
+  },
+  "torso|armNear": {
+   "back_visible_px_recoloured": 77,
+   "front_soft_edge_px_added": 77,
+   "bbox": [
+    362,
+    639,
+    445,
+    826
+   ],
+   "unmix_residual_max": 0.39
+  },
+  "armFar|torso": {
+   "back_visible_px_recoloured": 31,
+   "front_soft_edge_px_added": 31,
+   "bbox": [
+    667,
+    643,
+    701,
+    793
+   ],
+   "unmix_residual_max": 0.29
+  },
+  "legNear|torso": {
+   "back_visible_px_recoloured": 1,
+   "front_soft_edge_px_added": 1,
+   "bbox": [
+    510,
+    919,
+    511,
+    920
+   ],
+   "unmix_residual_max": 0.0
+  },
+  "legFar|torso": {
+   "back_visible_px_recoloured": 8,
+   "front_soft_edge_px_added": 8,
+   "bbox": [
+    570,
+    892,
+    635,
+    914
+   ],
+   "unmix_residual_max": 0.31
+  },
+  "torso|pendant": {
+   "back_visible_px_recoloured": 168,
+   "front_soft_edge_px_added": 168,
+   "bbox": [
+    562,
+    658,
+    646,
+    771
+   ],
+   "unmix_residual_max": 0.89
+  },
+  "why": "EXCEPTION (reported): step 2/3 cut every internal part/part boundary hard, so the BACK part's boundary row still holds the anti-aliasing mix with the FRONT part's colour (e.g. a light row of head-band colour on top of the brown collar, arm-tan dots on the tail's dark stripe). When the front part moves, that row stays behind as a dotted / light seam line. Fix that keeps the rest pose: for each back-part boundary pixel (alpha 255, 4-adjacent to an opaque front-part pixel) whose colour is > SEAM_TOL off the clean local colour of its own region (median of same-region non-boundary px within 3 px), the back pixel gets that clean colour and the FRONT layer gets a soft edge pixel there: alpha = projection of the mix on the (front colour - clean colour) line, colour un-mixed exactly for that alpha, so front-over- back reproduces the original pixel (verified: rest recomposite diff below).",
+  "torso->collar_front": {
+   "px_moved": 36,
+   "bbox": [
+    372,
+    621,
+    376,
+    639
+   ],
+   "why": "soft anti-aliased outline px of the collar's left end moved from torso to collar_front (rest composite identical: no layer between them there)"
+  }
+ },
+ "rest_pose_recomposite_diff_step4_vs_step3": {
+  "white": {
+   "max": 1,
+   "mean": 1.9073486328125e-06,
+   "px_diff": 6
+  },
+  "white_vs_step3_recomposite_png": {
+   "max": 1,
+   "mean": 1.9073486328125e-06
+  },
+  "green": {
+   "max": 1,
+   "mean": 1.9073486328125e-06,
+   "px_diff": 6
+  },
+  "dark": {
+   "max": 1,
+   "mean": 1.9073486328125e-06,
+   "px_diff": 6
+  }
+ },
+ "provisional_pivots": {
+  "armNear": [
+   410.7,
+   653.2
+  ],
+  "armFar": [
+   661.4,
+   657.1
+  ],
+  "head": [
+   526.0,
+   630.0
+  ],
+  "earNear": [
+   363.0,
+   220.4
+  ],
+  "earFar": [
+   662.3,
+   212.3
+  ],
+  "tuft": [
+   498.2,
+   166.0
+  ],
+  "legNear": [
+   444.5,
+   893.0
+  ],
+  "legFar": [
+   620.5,
+   881.0
+  ],
+  "tail": [
+   385.0,
+   835.0
+  ],
+  "pendant": [
+   599.0,
+   660.0
+  ],
+  "torso": [
+   526.0,
+   890.0
+  ],
+  "collar_front": [
+   526.0,
+   890.0
+  ]
+ },
+ "geometry": {
+  "torso_side_near": [
+   377.0,
+   648.0,
+   362.0,
+   834.0
+  ],
+  "collar": {
+   "bottom_poly": [
+    -3.44537124928127e-08,
+    7.123284959305963e-05,
+    -0.05598041789617071,
+    19.866405336543483,
+    -2013.568508120021
+   ],
+   "thickness": 54.0,
+   "ends": [
+    373.5,
+    675.5
+   ],
+   "neck_inset": 12.0,
+   "neck_height": 40.0
+  },
+  "armFar_band": {
+   "R": 16.0,
+   "hand_bottom_line": [
+    0.17669172932331145,
+    672.5969924812005
+   ]
+  },
+  "armNear_shoulder": {
+   "center": [
+    408.0,
+    652.5
+   ],
+   "half_width": 35.7,
+   "depth": 22.0,
+   "edge_ends": [
+    [
+     376.0,
+     639.0
+    ],
+    [
+     440.0,
+     666.0
+    ]
+   ]
+  },
+  "legNear": {
+   "hip_cap_ellipse": [
+    444.5,
+    893.0,
+    67.0,
+    40.0
+   ],
+   "sides": [
+    377.5,
+    511.5
+   ]
+  },
+  "legFar": {
+   "hip_cap_ellipse": [
+    620.5,
+    881.0,
+    63.0,
+    40.0
+   ],
+   "sides": [
+    557.5,
+    683.5
+   ]
+  },
+  "head_top_circle": [
+   516.2089970345983,
+   408.2263254362831,
+   255.7098991406324
+  ],
+  "tail": {
+   "hull_window": [
+    255,
+    600,
+    400,
+    890
+   ],
+   "root_behind_torso_px": 40.0
+  }
+ },
+ "motion_test": {
+  "poses": [
+   {
+    "pose": "rest",
+    "new_enclosed_hole_px_before": 0,
+    "new_enclosed_hole_px_after": 0
+   },
+   {
+    "pose": "arms out 35 (armNear ccw-35 = out, armFar +35 = out)",
+    "new_enclosed_hole_px_before": 8929,
+    "new_enclosed_hole_px_after": 0
+   },
+   {
+    "pose": "arms in 35 (armNear +35, armFar -35)",
+    "new_enclosed_hole_px_before": 0,
+    "new_enclosed_hole_px_after": 2
+   },
+   {
+    "pose": "head +8 (ccw; ears+tuft follow)",
+    "new_enclosed_hole_px_before": 2103,
+    "new_enclosed_hole_px_after": 1843
+   },
+   {
+    "pose": "head -8 (cw; ears+tuft follow)",
+    "new_enclosed_hole_px_before": 271,
+    "new_enclosed_hole_px_after": 7
+   },
+   {
+    "pose": "ears +15",
+    "new_enclosed_hole_px_before": 6,
+    "new_enclosed_hole_px_after": 0
+   },
+   {
+    "pose": "ears -15",
+    "new_enclosed_hole_px_before": 3,
+    "new_enclosed_hole_px_after": 1
+   },
+   {
+    "pose": "tuft +10",
+    "new_enclosed_hole_px_before": 1,
+    "new_enclosed_hole_px_after": 0
+   },
+   {
+    "pose": "tuft -10",
+    "new_enclosed_hole_px_before": 2,
+    "new_enclosed_hole_px_after": 2
+   },
+   {
+    "pose": "legs apart 18 (legNear -18, legFar +18)",
+    "new_enclosed_hole_px_before": 2,
+    "new_enclosed_hole_px_after": 0
+   },
+   {
+    "pose": "legs together 18 (legNear +18, legFar -18)",
+    "new_enclosed_hole_px_before": 1,
+    "new_enclosed_hole_px_after": 0
+   },
+   {
+    "pose": "tail +8 (ccw)",
+    "new_enclosed_hole_px_before": 4,
+    "new_enclosed_hole_px_after": 1
+   },
+   {
+    "pose": "tail -8 (cw)",
+    "new_enclosed_hole_px_before": 1126,
+    "new_enclosed_hole_px_after": 1124
+   },
+   {
+    "pose": "pendant +10",
+    "new_enclosed_hole_px_before": 1088,
+    "new_enclosed_hole_px_after": 0
+   },
+   {
+    "pose": "pendant -10",
+    "new_enclosed_hole_px_before": 1086,
+    "new_enclosed_hole_px_after": 0
+   }
+  ],
+  "note": "step-4 test convention: + = counter-clockwise on screen (step 5 rig: + = clockwise)"
+ }
+}

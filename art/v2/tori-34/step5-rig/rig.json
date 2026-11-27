@@ -1,0 +1,638 @@
+{
+ "name": "tori-v2-34",
+ "version": 1,
+ "view": "three-quarter (3/4), facing the viewer's right; Near = viewer-left side, Far = viewer-right side",
+ "canvas": [
+  1024,
+  1024
+ ],
+ "units": "px on the 1024x1024 source canvas (y down)",
+ "angleConvention": "degrees, + = clockwise on screen (same sign as CSS rotate()); Near/Far = closer to / turned away from the viewer (Near on the viewer's left in this view)",
+ "transformModel": "M(part) = M(parent) . T(dx,dy) . T(a) S(sx,sy) T(-a) . T(pivot) R(deg) T(-pivot); a = scale anchor (default pivot, or an entry of 'anchors'); a child first rotates about its own pivot and then follows its parent. Draw parts as one flat list sorted by z (z interleaves across the hierarchy, e.g. tail and far arm behind the torso). CSS per part: left=x, top=y, width=w, height=h, transform-origin: -x px -y px, transform = <root> <...ancestors> <part>, each level = translate(dx,dy) translate(ax,ay) scale(sx,sy) translate(-ax,-ay) translate(px,py) rotate(deg) translate(-px,-py). Reference implementation: scripts/v2/step5_rig.py (3/4 build: scripts/v2/34/step5_rig.py) (world_matrices / Rig.render).",
+ "partNameMap": {
+  "note": "front-view names -> 3/4-view names (same roles)",
+  "earL": "earNear",
+  "earR": "earFar",
+  "armL": "armNear",
+  "armR": "armFar",
+  "legL": "legNear",
+  "legR": "legFar"
+ },
+ "root": {
+  "origin": [
+   532.5,
+   979.0
+  ],
+  "originNote": "bottom-centre between the feet (x = torso/hip centre, y = first row below the soles); place this point on the scene ground line",
+  "height": 909,
+  "heightNote": "feet line to the top of the tuft (alpha>=128)",
+  "bbox": [
+   90,
+   68,
+   806,
+   979
+  ]
+ },
+ "drawOrder": [
+  "tail",
+  "legFar",
+  "legNear",
+  "armFar",
+  "torso",
+  "pendant",
+  "armNear",
+  "collar_front",
+  "earFar",
+  "earNear",
+  "tuft",
+  "head"
+ ],
+ "parts": {
+  "tail": {
+   "file": "tail.png",
+   "x": 88,
+   "y": 561,
+   "w": 314,
+   "h": 324,
+   "pivot": [
+    385.0,
+    835.0
+   ],
+   "parent": "torso",
+   "z": 0,
+   "limits": {
+    "minDeg": -8,
+    "maxDeg": 8
+   },
+   "pivotNote": "tail root behind the torso's near side (step-4 root fill), so the curl swings while the root stays hidden",
+   "limitsNote": "+-8."
+  },
+  "legFar": {
+   "file": "legFar.png",
+   "x": 554,
+   "y": 839,
+   "w": 134,
+   "h": 136,
+   "pivot": [
+    620.5,
+    881.0
+   ],
+   "parent": "root",
+   "z": 1,
+   "limits": {
+    "minDeg": -15,
+    "maxDeg": 15
+   },
+   "pivotNote": "centre of the far leg's hip-cap half-ellipse filled under the torso in step 4",
+   "limitsNote": "+-15 (same reason)."
+  },
+  "legNear": {
+   "file": "legNear.png",
+   "x": 373,
+   "y": 851,
+   "w": 143,
+   "h": 130,
+   "pivot": [
+    444.5,
+    893.0
+   ],
+   "parent": "root",
+   "z": 2,
+   "limits": {
+    "minDeg": -15,
+    "maxDeg": 15
+   },
+   "pivotNote": "centre of the near leg's hip-cap half-ellipse filled under the torso in step 4",
+   "limitsNote": "+-15: beyond, the torso's hard hip-cut corner at the gap between the legs starts to show."
+  },
+  "armFar": {
+   "file": "armFar.png",
+   "x": 646,
+   "y": 622,
+   "w": 114,
+   "h": 184,
+   "pivot": [
+    672.0,
+    660.0
+   ],
+   "parent": "torso",
+   "z": 3,
+   "limits": {
+    "minDeg": -20,
+    "maxDeg": 10
+   },
+   "pivotNote": "far shoulder behind the collar's right end / torso (the far arm is drawn behind the torso)",
+   "limitsNote": "- = raise outward. The far arm is BEHIND the torso: lifting it shows the torso's side edge, which is the hard step-2 cut along the arm's inner shading -> kept to -25 (subtle swing); + (in) 10."
+  },
+  "torso": {
+   "file": "torso.png",
+   "x": 359,
+   "y": 559,
+   "w": 345,
+   "h": 363,
+   "pivot": [
+    532.5,
+    887.0
+   ],
+   "parent": "root",
+   "z": 4,
+   "limits": {
+    "minDeg": -5,
+    "maxDeg": 5
+   },
+   "pivotNote": "hip centre between the two hip-cap centres (lean / sway); legs are root children so the feet stay planted",
+   "limitsNote": "+-5 lean about the hips, feet planted."
+  },
+  "pendant": {
+   "file": "pendant.png",
+   "x": 560,
+   "y": 656,
+   "w": 88,
+   "h": 117,
+   "pivot": [
+    599.0,
+    660.0
+   ],
+   "parent": "torso",
+   "z": 5,
+   "limits": {
+    "minDeg": -10,
+    "maxDeg": 10
+   },
+   "pivotNote": "top of the acorn stem where it hangs from the collar",
+   "limitsNote": "+-10."
+  },
+  "armNear": {
+   "file": "armNear.png",
+   "x": 293,
+   "y": 626,
+   "w": 154,
+   "h": 202,
+   "pivot": [
+    409.0,
+    656.0
+   ],
+   "parent": "torso",
+   "z": 6,
+   "limits": {
+    "minDeg": -15,
+    "maxDeg": 75
+   },
+   "pivotNote": "centre of the rounded shoulder end (step-4 cap), hidden under collar_front: ball joint",
+   "limitsNote": "+ = raise outward (wave: +45..+75); - = in towards the belly, kept to 15."
+  },
+  "collar_front": {
+   "file": "collar_front.png",
+   "x": 370,
+   "y": 615,
+   "w": 102,
+   "h": 98,
+   "pivot": [
+    532.5,
+    887.0
+   ],
+   "parent": "torso",
+   "z": 7,
+   "limits": {
+    "minDeg": 0,
+    "maxDeg": 0
+   },
+   "pivotNote": "rigid part of the torso (same pivot, never rotated on its own; limits 0)"
+  },
+  "earFar": {
+   "file": "earFar.png",
+   "x": 629,
+   "y": 127,
+   "w": 97,
+   "h": 112,
+   "pivot": [
+    662.3,
+    212.3
+   ],
+   "parent": "head",
+   "z": 8,
+   "limits": {
+    "minDeg": -15,
+    "maxDeg": 15
+   },
+   "pivotNote": "base of the far (turned-away) ear where it enters the head outline",
+   "limitsNote": "+-15."
+  },
+  "earNear": {
+   "file": "earNear.png",
+   "x": 281,
+   "y": 118,
+   "w": 121,
+   "h": 130,
+   "pivot": [
+    363.0,
+    220.4
+   ],
+   "parent": "head",
+   "z": 9,
+   "limits": {
+    "minDeg": -15,
+    "maxDeg": 15
+   },
+   "pivotNote": "ear base where the near ear enters the head outline",
+   "limitsNote": "+-15."
+  },
+  "tuft": {
+   "file": "tuft.png",
+   "x": 425,
+   "y": 66,
+   "w": 161,
+   "h": 153,
+   "pivot": [
+    498.0,
+    167.0
+   ],
+   "parent": "head",
+   "z": 10,
+   "limits": {
+    "minDeg": -8,
+    "maxDeg": 8
+   },
+   "pivotNote": "tuft root ~14 px below the head outline at the centre of the contact span (base hidden behind the head)",
+   "limitsNote": "+-8 as front (flat tuft behind the head)."
+  },
+  "head": {
+   "file": "head.png",
+   "x": 242,
+   "y": 151,
+   "w": 566,
+   "h": 492,
+   "pivot": [
+    526.0,
+    630.0
+   ],
+   "parent": "torso",
+   "z": 11,
+   "limits": {
+    "minDeg": -8,
+    "maxDeg": 8
+   },
+   "pivotNote": "neck: under the head's bottom edge, inside the step-4 neck/collar fill",
+   "limitsNote": "+-8 (step-4 neck/collar fill under the head)."
+  }
+ },
+ "anchors": {
+  "breath": {
+   "point": [
+    532.5,
+    979.0
+   ],
+   "target": "torso",
+   "use": "torso scaleY (breathing / squash) anchored at the feet line; children (head, arms, tail, pendant, collar_front) follow; legs are root children so they stay planted",
+   "range": {
+    "sy": [
+     0.97,
+     1.03
+    ],
+    "sx": [
+     0.99,
+     1.02
+    ]
+   }
+  },
+  "lean": {
+   "point": [
+    532.5,
+    887.0
+   ],
+   "target": "torso",
+   "use": "body lean / sway = torso rotation about the hip centre (feet stay planted)"
+  },
+  "headBob": {
+   "point": [
+    526.0,
+    630.0
+   ],
+   "target": "head",
+   "use": "head squash (scaleY ~0.97-1.03) anchored at the neck"
+  }
+ },
+ "checks": {
+  "rest": {
+   "white": {
+    "rig_render_from_crops_vs_final_full_layers": {
+     "max": 0,
+     "px_diff": 0
+    },
+    "vs_step4_rest": {
+     "outside_tuft_area": {
+      "max": 2,
+      "px_diff": 3,
+      "px_diff_gt2": 0
+     },
+     "inside_tuft_area": {
+      "px": 10138,
+      "px_diff": 10137,
+      "max": 125
+     }
+    }
+   },
+   "green": {
+    "rig_render_from_crops_vs_final_full_layers": {
+     "max": 0,
+     "px_diff": 0
+    },
+    "vs_step4_rest": {
+     "outside_tuft_area": {
+      "max": 2,
+      "px_diff": 3,
+      "px_diff_gt2": 0
+     },
+     "inside_tuft_area": {
+      "px": 10138,
+      "px_diff": 10136,
+      "max": 125
+     }
+    }
+   },
+   "dark": {
+    "rig_render_from_crops_vs_final_full_layers": {
+     "max": 0,
+     "px_diff": 0
+    },
+    "vs_step4_rest": {
+     "outside_tuft_area": {
+      "max": 2,
+      "px_diff": 3,
+      "px_diff_gt2": 0
+     },
+     "inside_tuft_area": {
+      "px": 10138,
+      "px_diff": 10137,
+      "max": 125
+     }
+    }
+   }
+  },
+  "tuft": {
+   "flat_colour": [
+    235,
+    190,
+    128
+   ],
+   "flat_colour_sample": "median of 20530 opaque head px in x300-720,y170-260 within 12 of tan (stripes excluded)",
+   "head_px_newly_visible": 563,
+   "base_extension": {
+    "shape": "convex hull of the completed left/right lobe ellipses (bbox [429, 104, 460, 169] / [519, 103, 582, 160]) and a U (x 454..542, straight to y=192, round bottom to y=216), clipped to the contact span x 436.5..559.5, kept only where the head is opaque (hidden)",
+    "px_alpha_raised": 5291,
+    "new_px_outside_step4_tuft": 5275,
+    "new_px_outside_step4_tuft_not_under_opaque_head": 0,
+    "bbox": [
+     427,
+     68,
+     584,
+     217
+    ]
+   },
+   "contact_span_x": [
+    438.0,
+    558.0
+   ]
+  },
+  "tuft_sway": {
+   "-10": {
+    "new_crack_px": 50,
+    "new_hole_px": 0,
+    "closed_off_background_pocket_px": 0
+   },
+   "-8": {
+    "new_crack_px": 46,
+    "new_hole_px": 0,
+    "closed_off_background_pocket_px": 0
+   },
+   "-5": {
+    "new_crack_px": 40,
+    "new_hole_px": 0,
+    "closed_off_background_pocket_px": 0
+   },
+   "5": {
+    "new_crack_px": 49,
+    "new_hole_px": 0,
+    "closed_off_background_pocket_px": 0
+   },
+   "8": {
+    "new_crack_px": 57,
+    "new_hole_px": 0,
+    "closed_off_background_pocket_px": 0
+   },
+   "10": {
+    "new_crack_px": 68,
+    "new_hole_px": 1,
+    "closed_off_background_pocket_px": 0
+   }
+  },
+  "arm_collar_unmix": {
+   "armNear": {
+    "interior_alpha_px": 39,
+    "max_rest_residual": 0.39,
+    "dark_edge_px": 20,
+    "dark_edge_max_rest_residual": 0.47
+   },
+   "torso_head_unmix": {
+    "px": 37,
+    "max_rest_residual": 1.73
+   }
+  },
+  "range_test": {
+   "tail": {
+    "-8": {
+     "new_crack_px": 5,
+     "new_hole_px": 1,
+     "closed_off_background_pocket_px": 0
+    },
+    "8": {
+     "new_crack_px": 8,
+     "new_hole_px": 0,
+     "closed_off_background_pocket_px": 1124
+    }
+   },
+   "legFar": {
+    "-15": {
+     "new_crack_px": 14,
+     "new_hole_px": 0,
+     "closed_off_background_pocket_px": 0
+    },
+    "15": {
+     "new_crack_px": 16,
+     "new_hole_px": 0,
+     "closed_off_background_pocket_px": 0
+    }
+   },
+   "legNear": {
+    "-15": {
+     "new_crack_px": 5,
+     "new_hole_px": 0,
+     "closed_off_background_pocket_px": 0
+    },
+    "15": {
+     "new_crack_px": 12,
+     "new_hole_px": 0,
+     "closed_off_background_pocket_px": 0
+    }
+   },
+   "armFar": {
+    "-20": {
+     "new_crack_px": 71,
+     "new_hole_px": 3,
+     "closed_off_background_pocket_px": 0
+    },
+    "-5.0": {
+     "new_crack_px": 1,
+     "new_hole_px": 0,
+     "closed_off_background_pocket_px": 0
+    },
+    "10": {
+     "new_crack_px": 12,
+     "new_hole_px": 1,
+     "closed_off_background_pocket_px": 0
+    }
+   },
+   "torso": {
+    "-5": {
+     "new_crack_px": 55,
+     "new_hole_px": 17,
+     "closed_off_background_pocket_px": 0
+    },
+    "5": {
+     "new_crack_px": 46,
+     "new_hole_px": 10,
+     "closed_off_background_pocket_px": 28
+    }
+   },
+   "pendant": {
+    "-10": {
+     "new_crack_px": 0,
+     "new_hole_px": 0,
+     "closed_off_background_pocket_px": 0
+    },
+    "10": {
+     "new_crack_px": 0,
+     "new_hole_px": 0,
+     "closed_off_background_pocket_px": 0
+    }
+   },
+   "armNear": {
+    "-15": {
+     "new_crack_px": 4,
+     "new_hole_px": 4,
+     "closed_off_background_pocket_px": 1
+    },
+    "30.0": {
+     "new_crack_px": 8,
+     "new_hole_px": 0,
+     "closed_off_background_pocket_px": 0
+    },
+    "75": {
+     "new_crack_px": 0,
+     "new_hole_px": 0,
+     "closed_off_background_pocket_px": 0
+    }
+   },
+   "earFar": {
+    "-15": {
+     "new_crack_px": 20,
+     "new_hole_px": 0,
+     "closed_off_background_pocket_px": 0
+    },
+    "15": {
+     "new_crack_px": 23,
+     "new_hole_px": 1,
+     "closed_off_background_pocket_px": 0
+    }
+   },
+   "earNear": {
+    "-15": {
+     "new_crack_px": 12,
+     "new_hole_px": 0,
+     "closed_off_background_pocket_px": 0
+    },
+    "15": {
+     "new_crack_px": 18,
+     "new_hole_px": 0,
+     "closed_off_background_pocket_px": 0
+    }
+   },
+   "tuft": {
+    "-8": {
+     "new_crack_px": 46,
+     "new_hole_px": 0,
+     "closed_off_background_pocket_px": 0
+    },
+    "8": {
+     "new_crack_px": 57,
+     "new_hole_px": 0,
+     "closed_off_background_pocket_px": 0
+    }
+   },
+   "head": {
+    "-8": {
+     "new_crack_px": 67,
+     "new_hole_px": 29,
+     "closed_off_background_pocket_px": 1814
+    },
+    "8": {
+     "new_crack_px": 15,
+     "new_hole_px": 0,
+     "closed_off_background_pocket_px": 7
+    }
+   }
+  },
+  "combined_poses": [
+   {
+    "pose": "wave: armNear max raise (+75), head -4, earNear +8, tuft -5",
+    "new_hole_px": 0,
+    "closed_off_background_pocket_px": 18
+   },
+   {
+    "pose": "wave mid: armNear +50, armFar -10, head +3",
+    "new_hole_px": 3,
+    "closed_off_background_pocket_px": 14
+   },
+   {
+    "pose": "head tilt min (-8) + ears +12 + tuft max",
+    "new_hole_px": 0,
+    "closed_off_background_pocket_px": 1843
+   },
+   {
+    "pose": "head tilt max (8) + ears -12 + tuft min",
+    "new_hole_px": 0,
+    "closed_off_background_pocket_px": 7
+   },
+   {
+    "pose": "walk A: legNear +12 legFar -12, armNear -12 armFar -12 (opposite), torso +2, tail +6",
+    "new_hole_px": 0,
+    "closed_off_background_pocket_px": 1896
+   },
+   {
+    "pose": "walk B: legNear -12 legFar +12, armNear +15 armFar +8, torso -2, tail -6",
+    "new_hole_px": 8,
+    "closed_off_background_pocket_px": 18
+   },
+   {
+    "pose": "breath in: torso sy 1.03 (anchor breath = feet line), head -3, tuft +5",
+    "new_hole_px": 1,
+    "closed_off_background_pocket_px": 23
+   },
+   {
+    "pose": "hop squash: torso sy 0.97 sx 1.02, legs +-8, arms out (armNear +30, armFar -20)",
+    "new_hole_px": 0,
+    "closed_off_background_pocket_px": 14
+   },
+   {
+    "pose": "lean: torso -5, head +6, arms (armNear +20, armFar -15), tail +8",
+    "new_hole_px": 0,
+    "closed_off_background_pocket_px": 28
+   },
+   {
+    "pose": "lean: torso +5, head -6, tail -8",
+    "new_hole_px": 1,
+    "closed_off_background_pocket_px": 18
+   }
+  ]
+ }
+}

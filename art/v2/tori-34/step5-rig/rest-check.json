@@ -1,0 +1,56 @@
+{
+ "white": {
+  "rig_render_from_crops_vs_final_full_layers": {
+   "max": 0,
+   "px_diff": 0
+  },
+  "vs_step4_rest": {
+   "outside_tuft_area": {
+    "max": 2,
+    "px_diff": 3,
+    "px_diff_gt2": 0
+   },
+   "inside_tuft_area": {
+    "px": 10138,
+    "px_diff": 10137,
+    "max": 125
+   }
+  }
+ },
+ "green": {
+  "rig_render_from_crops_vs_final_full_layers": {
+   "max": 0,
+   "px_diff": 0
+  },
+  "vs_step4_rest": {
+   "outside_tuft_area": {
+    "max": 2,
+    "px_diff": 3,
+    "px_diff_gt2": 0
+   },
+   "inside_tuft_area": {
+    "px": 10138,
+    "px_diff": 10136,
+    "max": 125
+   }
+  }
+ },
+ "dark": {
+  "rig_render_from_crops_vs_final_full_layers": {
+   "max": 0,
+   "px_diff": 0
+  },
+  "vs_step4_rest": {
+   "outside_tuft_area": {
+    "max": 2,
+    "px_diff": 3,
+    "px_diff_gt2": 0
+   },
+   "inside_tuft_area": {
+    "px": 10138,
+    "px_diff": 10137,
+    "max": 125
+   }
+  }
+ }
+}

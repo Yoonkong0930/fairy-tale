@@ -1,0 +1,479 @@
+{
+ "source": "art/v2/tori-34/original.png",
+ "canvas": [
+  1024,
+  1024
+ ],
+ "foreground_px": 414060,
+ "naming": "Near = closer to the viewer (viewer-left: near ear, near arm in front of the tail, near leg); Far = turned away (viewer-right)",
+ "partition_check": {
+  "overlap_px": 0,
+  "unassigned_fg_px": 0,
+  "mask_px_in_background": 0
+ },
+ "ai_guides": {
+  "ai_no_tail": {
+   "iou": 0.9942,
+   "meandiff": 1.3
+  },
+  "ai_tail_only": {
+   "inside_tail_meandiff": 6.15,
+   "frac_of_no_tail_change_that_is_non_green": 0.9975
+  },
+  "ai_no_ears": {
+   "iou": 0.9999,
+   "meandiff": 1.38
+  }
+ },
+ "arm_cuts_xy": {
+  "armNear": [
+   [
+    469.5,
+    595
+   ],
+   [
+    466.1,
+    605
+   ],
+   [
+    462.7,
+    615
+   ],
+   [
+    459.2,
+    625
+   ],
+   [
+    455.8,
+    635
+   ],
+   [
+    452.4,
+    645
+   ],
+   [
+    449.0,
+    655
+   ],
+   [
+    445.5,
+    665
+   ],
+   [
+    442.1,
+    675
+   ],
+   [
+    438.7,
+    685
+   ],
+   [
+    435.2,
+    695
+   ],
+   [
+    431.8,
+    705
+   ],
+   [
+    428.5,
+    715
+   ],
+   [
+    425.5,
+    725
+   ],
+   [
+    422.5,
+    735
+   ],
+   [
+    418.5,
+    745
+   ],
+   [
+    414.5,
+    755
+   ],
+   [
+    410.5,
+    765
+   ],
+   [
+    405.5,
+    775
+   ],
+   [
+    400.5,
+    785
+   ],
+   [
+    394.5,
+    795
+   ],
+   [
+    387.5,
+    805
+   ],
+   [
+    378.5,
+    815
+   ],
+   [
+    364.5,
+    825
+   ]
+  ],
+  "armFar": [
+   [
+    644.2,
+    595
+   ],
+   [
+    647.6,
+    605
+   ],
+   [
+    650.9,
+    615
+   ],
+   [
+    654.3,
+    625
+   ],
+   [
+    657.6,
+    635
+   ],
+   [
+    661.0,
+    645
+   ],
+   [
+    664.3,
+    655
+   ],
+   [
+    667.6,
+    665
+   ],
+   [
+    671.0,
+    675
+   ],
+   [
+    673.5,
+    685
+   ],
+   [
+    677.5,
+    695
+   ],
+   [
+    680.5,
+    705
+   ],
+   [
+    684.5,
+    715
+   ],
+   [
+    687.5,
+    725
+   ],
+   [
+    689.5,
+    735
+   ],
+   [
+    691.5,
+    745
+   ],
+   [
+    693.5,
+    755
+   ],
+   [
+    695.5,
+    765
+   ],
+   [
+    696.5,
+    775
+   ],
+   [
+    697.5,
+    785
+   ],
+   [
+    699.5,
+    795
+   ],
+   [
+    699.5,
+    805
+   ]
+  ]
+ },
+ "leg_polys": {
+  "legNear": [
+   [
+    300,
+    880
+   ],
+   [
+    312,
+    880
+   ],
+   [
+    513,
+    919
+   ],
+   [
+    527,
+    933
+   ],
+   [
+    527,
+    1010
+   ],
+   [
+    300,
+    1010
+   ]
+  ],
+  "legFar": [
+   [
+    542,
+    1010
+   ],
+   [
+    542,
+    933
+   ],
+   [
+    556,
+    919
+   ],
+   [
+    558,
+    915
+   ],
+   [
+    562,
+    915
+   ],
+   [
+    566,
+    914
+   ],
+   [
+    570,
+    913
+   ],
+   [
+    574,
+    912
+   ],
+   [
+    578,
+    911
+   ],
+   [
+    582,
+    911
+   ],
+   [
+    586,
+    910
+   ],
+   [
+    590,
+    908
+   ],
+   [
+    594,
+    907
+   ],
+   [
+    598,
+    906
+   ],
+   [
+    602,
+    905
+   ],
+   [
+    606,
+    903
+   ],
+   [
+    610,
+    902
+   ],
+   [
+    614,
+    900
+   ],
+   [
+    618,
+    898
+   ],
+   [
+    622,
+    896
+   ],
+   [
+    626,
+    894
+   ],
+   [
+    630,
+    892
+   ],
+   [
+    634,
+    892
+   ],
+   [
+    634,
+    892
+   ],
+   [
+    685,
+    880
+   ],
+   [
+    760,
+    880
+   ],
+   [
+    760,
+    1010
+   ]
+  ]
+ },
+ "parts": {
+  "head": {
+   "bbox": [
+    244,
+    157,
+    806,
+    639
+   ],
+   "area": 215099,
+   "components": 1,
+   "note": "Face/head incl. stripes, cheeks, pinkish-beige bottom band; bottom = colour edge vs collar / tail / arm tops / background; near-ear + tuft junctions = AI-continued outline (ai_no_ears); far-ear junction = colour edge (ear brown vs head tan)."
+  },
+  "tuft": {
+   "bbox": [
+    427,
+    68,
+    584,
+    167
+   ],
+   "area": 10117,
+   "components": 1,
+   "note": "Cowlick blobs above the AI-continued head outline + their soft lower shading over the head."
+  },
+  "earNear": {
+   "bbox": [
+    283,
+    120,
+    400,
+    243
+   ],
+   "area": 9710,
+   "components": 1,
+   "note": "Viewer-left (near) ear: original px outside the ai_no_ears head outline + inner-oval px clipped by it."
+  },
+  "earFar": {
+   "bbox": [
+    631,
+    129,
+    724,
+    234
+   ],
+   "area": 6181,
+   "components": 1,
+   "note": "Viewer-right (far) ear (cand4 transplant, step 1): solid ear-brown disc by colour (exact edge vs head tan) + white-blended rim."
+  },
+  "torso": {
+   "bbox": [
+    361,
+    616,
+    702,
+    920
+   ],
+   "area": 72811,
+   "components": 1,
+   "note": "Body incl. collar band, belly, crotch; bounded by arm shading edges, hip cuts, tail mask, head band."
+  },
+  "pendant": {
+   "bbox": [
+    563,
+    658,
+    645,
+    770
+   ],
+   "area": 5913,
+   "components": 1,
+   "note": "Acorn only (olive cap+stem, green nut, highlights) by colour in the pendant window, holes filled."
+  },
+  "armNear": {
+   "bbox": [
+    296,
+    637,
+    445,
+    826
+   ],
+   "area": 16006,
+   "components": 1,
+   "note": "Torso-side (right) edge of the arm's underside shading wedge per row, continued straight up to the collar; collar shadow on the shoulder included; outer side bounded by the AI tail mask."
+  },
+  "armFar": {
+   "bbox": [
+    664,
+    640,
+    758,
+    804
+   ],
+   "area": 7700,
+   "components": 1,
+   "note": "Torso-side (left) edge of the far arm's inner shading stripe per row, continued straight up to the collar; below the hand a vertical line (torso side)."
+  },
+  "legNear": {
+   "bbox": [
+    375,
+    893,
+    514,
+    979
+   ],
+   "area": 7772,
+   "components": 1,
+   "note": "Hip cut: straight line from the outer silhouette (y=880) to the top-left corner of the gap between the legs, then down the gap."
+  },
+  "legFar": {
+   "bbox": [
+    556,
+    880,
+    686,
+    973
+   ],
+   "area": 7614,
+   "components": 1,
+   "note": "Gap top-right corner -> along the top edge of the inner-thigh shading crescent to its tip -> straight to the outer silhouette at y=880."
+  },
+  "tail": {
+   "bbox": [
+    90,
+    563,
+    369,
+    882
+   ],
+   "area": 55137,
+   "components": 1,
+   "note": "Pixels changed by ai_no_tail AND non-green in ai_tail_only (incl. the dark stripe sliver visible between the near hand and the torso)."
+  }
+ }
+}

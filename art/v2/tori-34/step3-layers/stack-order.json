@@ -1,0 +1,201 @@
+{
+ "canvas": [
+  1024,
+  1024
+ ],
+ "source": "art/v2/tori-34/original.png",
+ "masks": "art/v2/tori-34/step2-masks",
+ "draw_order_back_to_front": [
+  "tail",
+  "legFar",
+  "legNear",
+  "armFar",
+  "torso",
+  "pendant",
+  "armNear",
+  "earFar",
+  "earNear",
+  "head",
+  "tuft"
+ ],
+ "layers": {
+  "tail": {
+   "z": 0,
+   "file": "tail.png",
+   "bbox": [
+    90,
+    563,
+    369,
+    882
+   ],
+   "area_px": 55137,
+   "outer_edge_px": 3085,
+   "soft_alpha_px": 2775,
+   "internal_boundary_alpha_min": 255,
+   "why": "behind everything: the near arm's silhouette is drawn over it, the torso's left side and the head's bottom band cover its root (only the dark stripe sliver shows between hand and torso)."
+  },
+  "legFar": {
+   "z": 1,
+   "file": "legFar.png",
+   "bbox": [
+    556,
+    880,
+    686,
+    973
+   ],
+   "area_px": 7614,
+   "outer_edge_px": 870,
+   "soft_alpha_px": 834,
+   "internal_boundary_alpha_min": 255,
+   "why": "behind torso (hip cut under the torso's lower edge, as front); far leg first."
+  },
+  "legNear": {
+   "z": 2,
+   "file": "legNear.png",
+   "bbox": [
+    375,
+    893,
+    514,
+    979
+   ],
+   "area_px": 7772,
+   "outer_edge_px": 864,
+   "soft_alpha_px": 847,
+   "internal_boundary_alpha_min": 255,
+   "why": "behind torso (the torso's side continues into the leg; the hip joint hides under the torso)."
+  },
+  "armFar": {
+   "z": 3,
+   "file": "armFar.png",
+   "bbox": [
+    664,
+    640,
+    758,
+    804
+   ],
+   "area_px": 7700,
+   "outer_edge_px": 921,
+   "soft_alpha_px": 901,
+   "internal_boundary_alpha_min": 255,
+   "why": "FAR arm behind the torso: the torso's right side edge lies over the arm's inner shading stripe, and the collar end / head band are drawn over its shoulder (turned-away limb)."
+  },
+  "torso": {
+   "z": 4,
+   "file": "torso.png",
+   "bbox": [
+    361,
+    616,
+    702,
+    920
+   ],
+   "area_px": 72811,
+   "outer_edge_px": 663,
+   "soft_alpha_px": 632,
+   "internal_boundary_alpha_min": 255,
+   "why": "body incl. collar; over tail, legs and far arm; under pendant, near arm and head."
+  },
+  "pendant": {
+   "z": 5,
+   "file": "pendant.png",
+   "bbox": [
+    563,
+    658,
+    645,
+    770
+   ],
+   "area_px": 5913,
+   "outer_edge_px": 0,
+   "soft_alpha_px": 0,
+   "internal_boundary_alpha_min": 255,
+   "why": "hangs on the collar/belly: in front of the torso."
+  },
+  "armNear": {
+   "z": 6,
+   "file": "armNear.png",
+   "bbox": [
+    296,
+    637,
+    445,
+    826
+   ],
+   "area_px": 16006,
+   "outer_edge_px": 252,
+   "soft_alpha_px": 248,
+   "internal_boundary_alpha_min": 255,
+   "why": "NEAR arm in front of torso and tail: its underside shading wedge lies on the body, its silhouette overlaps the tail."
+  },
+  "earFar": {
+   "z": 7,
+   "file": "earFar.png",
+   "bbox": [
+    631,
+    129,
+    724,
+    234
+   ],
+   "area_px": 6181,
+   "outer_edge_px": 796,
+   "soft_alpha_px": 754,
+   "internal_boundary_alpha_min": 255,
+   "why": "behind head: the head outline passes over the ear base (step-1 transplant was composited so)."
+  },
+  "earNear": {
+   "z": 8,
+   "file": "earNear.png",
+   "bbox": [
+    283,
+    120,
+    400,
+    243
+   ],
+   "area_px": 9710,
+   "outer_edge_px": 978,
+   "soft_alpha_px": 956,
+   "internal_boundary_alpha_min": 255,
+   "why": "behind head: the head's round outline clips the inner-ear oval."
+  },
+  "head": {
+   "z": 9,
+   "file": "head.png",
+   "bbox": [
+    244,
+    157,
+    806,
+    639
+   ],
+   "area_px": 215099,
+   "outer_edge_px": 4116,
+   "soft_alpha_px": 3747,
+   "internal_boundary_alpha_min": 255,
+   "why": "head's bottom band overlaps the collar, both arm tops and the tail top."
+  },
+  "tuft": {
+   "z": 10,
+   "file": "tuft.png",
+   "bbox": [
+    427,
+    68,
+    584,
+    167
+   ],
+   "area_px": 10117,
+   "outer_edge_px": 1260,
+   "soft_alpha_px": 1258,
+   "internal_boundary_alpha_min": 255,
+   "why": "in front of head at step 3 (its soft lower shading overlaps the head top); step 5 flattens it and moves it behind the head, as decided for the front."
+  }
+ },
+ "edge_alpha": {
+  "method": "as front step 3 (functions imported from scripts/v2/step3_layers.py): outer silhouette band <= 3 px de-whited; internal boundaries alpha 255"
+ },
+ "glow_removal": "none needed: no pendant glow on the belly in this view",
+ "recomposite_white_vs_original": {
+  "max": 8,
+  "mean": 0.0142,
+  "px_diff_gt_0": 8999,
+  "px_diff_gt_2": 5585,
+  "max_inside_fg_away_from_edges": 0,
+  "max_in_background": 8,
+  "max_on_soft_edge": 0
+ }
+}
