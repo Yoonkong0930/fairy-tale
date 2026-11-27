@@ -1,0 +1,32 @@
+{
+ "white": {
+  "rig_render_from_crops_vs_final_full_layers": {
+   "max": 0,
+   "px_diff": 0
+  },
+  "rig_render_vs_step4_rest": {
+   "max": 0,
+   "px_diff": 0
+  }
+ },
+ "green": {
+  "rig_render_from_crops_vs_final_full_layers": {
+   "max": 0,
+   "px_diff": 0
+  },
+  "rig_render_vs_step4_rest": {
+   "max": 0,
+   "px_diff": 0
+  }
+ },
+ "dark": {
+  "rig_render_from_crops_vs_final_full_layers": {
+   "max": 0,
+   "px_diff": 0
+  },
+  "rig_render_vs_step4_rest": {
+   "max": 0,
+   "px_diff": 0
+  }
+ }
+}

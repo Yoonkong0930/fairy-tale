@@ -1,0 +1,161 @@
+{
+ "canvas": [
+  1024,
+  1024
+ ],
+ "source": "art/v2/tori-side/original.png",
+ "masks": "art/v2/tori-side/step2-masks",
+ "draw_order_back_to_front": [
+  "tail",
+  "legFar",
+  "legNear",
+  "torso",
+  "pendant",
+  "armNear",
+  "tuft",
+  "head",
+  "earNear"
+ ],
+ "layers": {
+  "tail": {
+   "z": 0,
+   "file": "tail.png",
+   "bbox": [
+    130,
+    565,
+    444,
+    878
+   ],
+   "area_px": 60219,
+   "outer_edge_px": 3587,
+   "soft_alpha_px": 3305,
+   "why": "behind everything: it touches only the torso's back edge (its shade / stripe / cream bands go behind the body)."
+  },
+  "legFar": {
+   "z": 1,
+   "file": "legFar.png",
+   "bbox": [
+    590,
+    855,
+    721,
+    967
+   ],
+   "area_px": 7745,
+   "outer_edge_px": 986,
+   "soft_alpha_px": 902,
+   "why": "far leg: behind the body and behind the near leg (darker, it disappears under the belly)."
+  },
+  "legNear": {
+   "z": 2,
+   "file": "legNear.png",
+   "bbox": [
+    429,
+    882,
+    550,
+    976
+   ],
+   "area_px": 6959,
+   "outer_edge_px": 901,
+   "soft_alpha_px": 897,
+   "why": "behind the torso: the near leg's fur continues the torso's fur, the hip end will be hidden under the belly bottom."
+  },
+  "torso": {
+   "z": 3,
+   "file": "torso.png",
+   "bbox": [
+    415,
+    613,
+    708,
+    910
+   ],
+   "area_px": 57581,
+   "outer_edge_px": 1229,
+   "soft_alpha_px": 1121,
+   "why": "body incl. collar; over the legs and tail, under the arm, pendant and head."
+  },
+  "pendant": {
+   "z": 4,
+   "file": "pendant.png",
+   "bbox": [
+    662,
+    640,
+    733,
+    732
+   ],
+   "area_px": 4397,
+   "outer_edge_px": 496,
+   "soft_alpha_px": 448,
+   "why": "hangs on the collar front: in front of the torso."
+  },
+  "armNear": {
+   "z": 5,
+   "file": "armNear.png",
+   "bbox": [
+    496,
+    653,
+    632,
+    819
+   ],
+   "area_px": 12671,
+   "outer_edge_px": 0,
+   "soft_alpha_px": 458,
+   "why": "near arm lies on the body side: in front of the torso (its top is tucked under the collar -> collar_front in step 5)."
+  },
+  "tuft": {
+   "z": 6,
+   "file": "tuft.png",
+   "bbox": [
+    502,
+    71,
+    676,
+    170
+   ],
+   "area_px": 9828,
+   "outer_edge_px": 1210,
+   "soft_alpha_px": 1244,
+   "why": "behind the head (front decision: flat tuft behind the head, base extended under it in step 5)."
+  },
+  "head": {
+   "z": 7,
+   "file": "head.png",
+   "bbox": [
+    307,
+    150,
+    831,
+    630
+   ],
+   "area_px": 190875,
+   "outer_edge_px": 4426,
+   "soft_alpha_px": 3670,
+   "why": "head's lower band overlaps the collar -> in front of the torso."
+  },
+  "earNear": {
+   "z": 8,
+   "file": "earNear.png",
+   "bbox": [
+    422,
+    116,
+    515,
+    244
+   ],
+   "area_px": 9279,
+   "outer_edge_px": 495,
+   "soft_alpha_px": 490,
+   "why": "in front of the head: the ear covers the head's back stripe."
+  }
+ },
+ "edge_alpha": "front method (scripts/v2/step3_layers.py dewhite); armNear = exact step-1 arm layer",
+ "glow_check": {
+  "ring_px": 1582,
+  "px_dev_gt6_from_flat_colours": 152,
+  "px_greenish(G>R)": 0
+ },
+ "recomposite_white_vs_original": {
+  "max": 8,
+  "mean": 0.1167,
+  "px_diff_gt2": 7156,
+  "max_inside_fg_off_soft_edges": 0,
+  "max_in_background": 8,
+  "max_under_arm_edge": 1
+ }
+}

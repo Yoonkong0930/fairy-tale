@@ -1,0 +1,123 @@
+{
+ "eye": {
+  "eye_bbox": [
+   660,
+   363,
+   737,
+   459
+  ],
+  "eye_axis_x": 698.0,
+  "mirror_X2": 1396,
+  "highlights_before(px,bbox)": [
+   [
+    506,
+    [
+     700,
+     378,
+     725,
+     404
+    ]
+   ],
+   [
+    174,
+    [
+     674,
+     426,
+     689,
+     441
+    ]
+   ]
+  ],
+  "highlight_px_mirrored": 924,
+  "highlight_px_outside_interior_skipped": 0,
+  "changed_px": 1830,
+  "changed_outside_eye": 0
+ },
+ "line": {
+  "line_core_px": 4286,
+  "line_px_painted": 4794,
+  "line_bbox": [
+   461,
+   677,
+   575,
+   833
+  ],
+  "fill_colour_range": [
+   [
+    233,
+    187,
+    127
+   ],
+   [
+    237,
+    192,
+    132
+   ]
+  ]
+ },
+ "arm": {
+  "ai_source": "work/ai_arm_green_e.png",
+  "transform": {
+   "s": 0.29,
+   "rot": -2.0,
+   "src": [
+    405,
+    290
+   ],
+   "dst": [
+    530,
+    661
+   ],
+   "offset": [
+    50,
+    -60
+   ]
+  },
+  "bbox": [
+   496,
+   653,
+   632,
+   819
+  ],
+  "opaque_px": 12417,
+  "coverage_px": 12875,
+  "shade_band_px": 4069,
+  "colours": {
+   "tan": [
+    235,
+    191,
+    130
+   ],
+   "shade/band": [
+    205,
+    148,
+    100
+   ],
+   "front_arm_ref": {
+    "tan": [
+     235,
+     190,
+     131
+    ],
+    "shade": [
+     207,
+     147,
+     97
+    ]
+   }
+  },
+  "collar_bottom_poly": [
+   -0.0011070801638677168,
+   1.3335795223156839,
+   262.1576848383806
+  ],
+  "band_bottom_poly": [
+   -0.0011729105975435137,
+   1.424491276379213,
+   247.46079362650784
+  ],
+  "paw_over_cream_px": 734
+ },
+ "changed_px_total": 18141,
+ "changed_px_outside(eye|line|arm)": 0
+}
