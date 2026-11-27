@@ -290,7 +290,7 @@
     57.326,
     12.0
    ],
-   "source": "AI sheet ai-mouths-1 cell 2: keyed, scaled x0.5464 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours"
+   "source": "AI sheet ai-mouths-1 cell 2: keyed, scaled x0.5464 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours | rim removed (scripts/v2/face_mouth_norim.py): rim recoloured to mouth-inside colour, same outer size; philtrum line kept"
   },
   "mouth-talk-s": {
    "file": "mouth-talk-s.png",
@@ -304,7 +304,7 @@
     22.326,
     12.0
    ],
-   "source": "AI sheet ai-mouths-1 cell 3: keyed, scaled x0.5464 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours"
+   "source": "AI sheet ai-mouths-1 cell 3: keyed, scaled x0.5464 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours | rim removed (scripts/v2/face_mouth_norim.py): rim recoloured to mouth-inside colour, same outer size; philtrum line kept"
   },
   "mouth-talk-m": {
    "file": "mouth-talk-m.png",
@@ -318,7 +318,7 @@
     38.326,
     12.0
    ],
-   "source": "AI sheet ai-mouths-1 cell 4: keyed, scaled x0.5464 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours"
+   "source": "AI sheet ai-mouths-1 cell 4: keyed, scaled x0.5464 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours | rim removed (scripts/v2/face_mouth_norim.py): rim recoloured to mouth-inside colour, same outer size; philtrum line kept"
   },
   "mouth-talk-l": {
    "file": "mouth-talk-l.png",
@@ -332,7 +332,7 @@
     33.326,
     12.0
    ],
-   "source": "AI sheet ai-mouths-1 cell 5: keyed, scaled x0.5464 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours"
+   "source": "AI sheet ai-mouths-1 cell 5: keyed, scaled x0.5464 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours | rim removed (scripts/v2/face_mouth_norim.py): rim recoloured to mouth-inside colour, same outer size; philtrum line kept"
   },
   "mouth-sad": {
    "file": "mouth-sad.png",
@@ -374,7 +374,7 @@
     25.326,
     12.0
    ],
-   "source": "AI sheet ai-mouths-1 cell 8: keyed, scaled x0.5464 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours"
+   "source": "AI sheet ai-mouths-1 cell 8: keyed, scaled x0.5464 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours | rim removed (scripts/v2/face_mouth_norim.py): rim recoloured to mouth-inside colour, same outer size; philtrum line kept"
   },
   "mouth-ee": {
    "file": "mouth-ee.png",
@@ -388,7 +388,7 @@
     61.326,
     12.0
    ],
-   "source": "AI sheet ai-mouths-1 cell 9: keyed, scaled x0.5408 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours"
+   "source": "AI sheet ai-mouths-1 cell 9: keyed, scaled x0.5408 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours | rim removed (scripts/v2/face_mouth_norim.py): rim recoloured to mouth-inside colour, same outer size; philtrum line kept"
   }
  },
  "expressions": {
@@ -547,5 +547,6 @@
   "hole_dilate_px": 3,
   "nose_top": 431,
   "nose_widest_row": 441
- }
+ },
+ "pipelineNote": "Run scripts/v2/face_parts.py, then scripts/v2/face_mouth_norim.py (removes open-mouth rims)."
 }
