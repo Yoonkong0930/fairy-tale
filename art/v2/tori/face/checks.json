@@ -1,0 +1,143 @@
+{
+ "recomposite_vs_step5_rest": {
+  "face_box_xywh": [
+   335,
+   290,
+   355,
+   225
+  ],
+  "all": {
+   "max": 213,
+   "mean": 1.1987,
+   "px_gt8": 1199,
+   "px_gt2": 6179
+  },
+  "excl_left_eye_lower_right_mark": {
+   "max": 118,
+   "mean": 0.6468,
+   "px_gt8": 879,
+   "px_gt2": 5685
+  },
+  "whole_canvas": {
+   "max": 213,
+   "mean": 0.09131
+  },
+  "note": "the only intended change is the left eye's lower-right brown dot -> white highlight (rule)",
+  "in_eyes_holes": {
+   "max": 118,
+   "mean": 2.492
+  },
+  "in_brows_holes": {
+   "max": 67,
+   "mean": 3.002
+  },
+  "in_nose+mouth_holes": {
+   "max": 41,
+   "mean": 1.496
+  }
+ },
+ "eye_highlights_identical": {
+  "eye-open": {
+   "part_pixels_max_diff": 1.0338396805309458e-11,
+   "rendered_opaque_max_diff": 0.0
+  },
+  "eye-surprised": {
+   "part_pixels_max_diff": 1.2963852213943028e-11,
+   "rendered_opaque_max_diff": 0.0
+  },
+  "eye-sad": {
+   "part_pixels_max_diff": 1.057287590811029e-11,
+   "rendered_opaque_max_diff": 0.0
+  }
+ },
+ "eye_vector_x1_vs_exact": {
+  "alpha_mean_abs": 0.0037,
+  "rgb_max": 54.71875
+ },
+ "mouth_normalisation": {
+  "mouth-neutral-ai": {
+   "ai_cell": 1,
+   "scale": 0.5464,
+   "ai_nose_w": 96.0,
+   "ai_line_w": 12.0,
+   "ai_line_w_scaled": 6.56,
+   "x_shift_px": -0.125
+  },
+  "mouth-smile-open": {
+   "ai_cell": 2,
+   "scale": 0.5464,
+   "ai_nose_w": 96.0,
+   "ai_line_w": 12.0,
+   "ai_line_w_scaled": 6.56,
+   "x_shift_px": 0.0
+  },
+  "mouth-talk-s": {
+   "ai_cell": 3,
+   "scale": 0.5464,
+   "ai_nose_w": 96.0,
+   "ai_line_w": 11.0,
+   "ai_line_w_scaled": 6.01,
+   "x_shift_px": 0.125
+  },
+  "mouth-talk-m": {
+   "ai_cell": 4,
+   "scale": 0.5464,
+   "ai_nose_w": 96.0,
+   "ai_line_w": 12.0,
+   "ai_line_w_scaled": 6.56,
+   "x_shift_px": -0.125
+  },
+  "mouth-talk-l": {
+   "ai_cell": 5,
+   "scale": 0.5464,
+   "ai_nose_w": 96.0,
+   "ai_line_w": 12.0,
+   "ai_line_w_scaled": 6.56,
+   "x_shift_px": 0.0
+  },
+  "mouth-sad": {
+   "ai_cell": 6,
+   "scale": 0.5408,
+   "ai_nose_w": 97.0,
+   "ai_line_w": 11.0,
+   "ai_line_w_scaled": 5.95,
+   "x_shift_px": 0.0
+  },
+  "mouth-angry": {
+   "ai_cell": 7,
+   "scale": 0.5408,
+   "ai_nose_w": 97.0,
+   "ai_line_w": 12.0,
+   "ai_line_w_scaled": 6.49,
+   "x_shift_px": -0.25
+  },
+  "mouth-o": {
+   "ai_cell": 8,
+   "scale": 0.5464,
+   "ai_nose_w": 96.0,
+   "ai_line_w": 12.0,
+   "ai_line_w_scaled": 6.56,
+   "x_shift_px": 0.0
+  },
+  "mouth-ee": {
+   "ai_cell": 9,
+   "scale": 0.5408,
+   "ai_nose_w": 97.0,
+   "ai_line_w": 11.0,
+   "ai_line_w_scaled": 5.95,
+   "x_shift_px": 0.0
+  }
+ },
+ "eye_lines": {
+  "blink": {
+   "depth_ratio": 0.15
+  },
+  "happy": {
+   "depth_ratio": 0.21
+  },
+  "ai_eye_diameter": 269.8879172456766,
+  "ai_line_w_blink": 42.63486842105263,
+  "ai_line_w_happy": 43.484177215189874
+ },
+ "ai_images_generated_this_run": []
+}

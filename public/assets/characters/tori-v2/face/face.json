@@ -1,0 +1,551 @@
+{
+ "name": "tori-v2 face",
+ "version": 1,
+ "canvas": [
+  1024,
+  1024
+ ],
+ "units": "px on the 1024x1024 source canvas (y down); continuous coords, pixel k covers [k, k+1)",
+ "parent": "head",
+ "placement": "for slot s and part p: image top-left = s.anchor - p.anchor (if s.mirror: flip the image horizontally and use anchor x = p.w - p.anchor[0]); the result is a child of 'head' at rest canvas coords, i.e. apply the head's world matrix from rig.json (step5_rig.world_matrices) exactly like head.png.  Slots of the same type share images: eyes are NEVER mirrored (the highlights must be identical), brows ARE mirrored for browR.",
+ "zOrder": [
+  "eyeL",
+  "eyeR",
+  "browL",
+  "browR",
+  "mouth",
+  "nose"
+ ],
+ "zOrderNote": "draw right after head-blank (all above the head), mouth below nose (philtrum tucks under it)",
+ "headBlank": {
+  "file": "../head-blank.png",
+  "x": 217,
+  "y": 152,
+  "w": 590,
+  "h": 489,
+  "note": "replaces head.png when the face parts are drawn (same box, same pivot)"
+ },
+ "slots": {
+  "eyeR": {
+   "anchor": [
+    628.878,
+    412.119
+   ],
+   "measured": [
+    628.878,
+    412.119
+   ],
+   "mirror": false
+  },
+  "eyeL": {
+   "anchor": [
+    395.878,
+    412.119
+   ],
+   "measured": [
+    395.487,
+    412.161
+   ],
+   "mirror": false
+  },
+  "browL": {
+   "anchor": [
+    393.64,
+    318.11
+   ],
+   "measured": [
+    393.64,
+    318.11
+   ],
+   "mirror": false
+  },
+  "nose": {
+   "anchor": [
+    512.119,
+    445.203
+   ],
+   "measured": [
+    512.119,
+    445.203
+   ],
+   "mirror": false
+  },
+  "mouth": {
+   "anchor": [
+    512.326,
+    461.0
+   ],
+   "measured": [
+    512.326,
+    461.0
+   ],
+   "mirror": false
+  },
+  "browR": {
+   "anchor": [
+    630.36,
+    318.11
+   ],
+   "measured": [
+    630.708,
+    318.127
+   ],
+   "mirror": true
+  }
+ },
+ "slotNotes": {
+  "eyeL/eyeR": "eye centres (alpha centroid of the disc).  eyeR = measured; eyeL snapped by +0.39,-0.04 px so the shared image lands on whole pixels",
+  "browL/browR": "brow centres (alpha centroid).  browR uses the mirrored image, snapped to whole pixels",
+  "nose": "nose alpha centroid",
+  "mouth": "top-centre attach point under the nose = philtrum axis x at the nose/philtrum split row; every mouth image's anchor is the top of its philtrum (the first 6 rows tuck under the nose)"
+ },
+ "parts": {
+  "eye-open": {
+   "file": "eye-open.png",
+   "type": "eye",
+   "slots": [
+    "eyeL",
+    "eyeR"
+   ],
+   "w": 104,
+   "h": 103,
+   "anchor": [
+    52.878,
+    51.119
+   ],
+   "source": "EXACT crop of the original viewer's-right eye (big white highlight upper-left, small white highlight lower-right); used for BOTH eyes, never mirrored"
+  },
+  "brow-neutral": {
+   "file": "brow-neutral.png",
+   "type": "brow",
+   "slots": [
+    "browL",
+    "browR"
+   ],
+   "w": 48,
+   "h": 22,
+   "anchor": [
+    23.64,
+    10.11
+   ],
+   "source": "EXACT crop of the original viewer's-left brow; right brow = mirrored"
+  },
+  "nose": {
+   "file": "nose.png",
+   "type": "nose",
+   "slots": [
+    "nose"
+   ],
+   "w": 56,
+   "h": 37,
+   "anchor": [
+    28.119,
+    19.203
+   ],
+   "source": "EXACT crop of the original nose (down to the philtrum)"
+  },
+  "mouth-neutral": {
+   "file": "mouth-neutral.png",
+   "type": "mouth",
+   "slots": [
+    "mouth"
+   ],
+   "w": 111,
+   "h": 50,
+   "anchor": [
+    55.326,
+    8.0
+   ],
+   "source": "EXACT crop of the original philtrum + w smile"
+  },
+  "eye-surprised": {
+   "file": "eye-surprised.png",
+   "type": "eye",
+   "slots": [
+    "eyeL",
+    "eyeR"
+   ],
+   "w": 114,
+   "h": 114,
+   "anchor": [
+    56.878,
+    57.119
+   ],
+   "source": "measured eye geometry (disc + both highlights, original colours) re-rendered x1.12"
+  },
+  "eye-blink": {
+   "file": "eye-blink.png",
+   "type": "eye",
+   "slots": [
+    "eyeL",
+    "eyeR"
+   ],
+   "w": 102,
+   "h": 25,
+   "anchor": [
+    50.878,
+    4.119
+   ],
+   "source": "AI sheet ai-eyes-1 cell 2 centreline (symmetric 4th-order fit), depth capped (gentle), re-stroked: span = eye diameter, width = mouth line, eye dark brown"
+  },
+  "eye-happy": {
+   "file": "eye-happy.png",
+   "type": "eye",
+   "slots": [
+    "eyeL",
+    "eyeR"
+   ],
+   "w": 102,
+   "h": 30,
+   "anchor": [
+    50.878,
+    15.119
+   ],
+   "source": "AI sheet ai-eyes-1 cell 3 centreline (symmetric fit), re-stroked: span = eye diameter, width = mouth line, eye dark brown"
+  },
+  "eye-sad": {
+   "file": "eye-sad.png",
+   "type": "eye",
+   "slots": [
+    "eyeL",
+    "eyeR"
+   ],
+   "w": 104,
+   "h": 103,
+   "anchor": [
+    52.878,
+    51.119
+   ],
+   "source": "eye-open (exact) + tear-shine crescent from AI sheet ai-eyes-1 cell 5 (flat highlight white)"
+  },
+  "brow-angry": {
+   "file": "brow-angry.png",
+   "type": "brow",
+   "slots": [
+    "browL",
+    "browR"
+   ],
+   "w": 48,
+   "h": 26,
+   "anchor": [
+    24.64,
+    10.11
+   ],
+   "source": "exact brow-neutral rotated to +16 deg tilt (inner end down), shifted +2 px"
+  },
+  "brow-sad": {
+   "file": "brow-sad.png",
+   "type": "brow",
+   "slots": [
+    "browL",
+    "browR"
+   ],
+   "w": 46,
+   "h": 31,
+   "anchor": [
+    22.64,
+    15.11
+   ],
+   "source": "exact brow-neutral rotated to -26 deg tilt (inner end up), shifted -1 px"
+  },
+  "brow-worried": {
+   "file": "brow-worried.png",
+   "type": "brow",
+   "slots": [
+    "browL",
+    "browR"
+   ],
+   "w": 47,
+   "h": 30,
+   "anchor": [
+    22.64,
+    22.11
+   ],
+   "source": "exact brow-neutral rotated to -24 deg tilt (inner end up), shifted -8 px"
+  },
+  "brow-raised": {
+   "file": "brow-raised.png",
+   "type": "brow",
+   "slots": [
+    "browL",
+    "browR"
+   ],
+   "w": 48,
+   "h": 24,
+   "anchor": [
+    23.64,
+    21.11
+   ],
+   "source": "exact brow-neutral rotated to -13 deg tilt (inner end up), shifted -10 px"
+  },
+  "mouth-smile-open": {
+   "file": "mouth-smile-open.png",
+   "type": "mouth",
+   "slots": [
+    "mouth"
+   ],
+   "w": 114,
+   "h": 87,
+   "anchor": [
+    57.326,
+    12.0
+   ],
+   "source": "AI sheet ai-mouths-1 cell 2: keyed, scaled x0.5464 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours"
+  },
+  "mouth-talk-s": {
+   "file": "mouth-talk-s.png",
+   "type": "mouth",
+   "slots": [
+    "mouth"
+   ],
+   "w": 45,
+   "h": 68,
+   "anchor": [
+    22.326,
+    12.0
+   ],
+   "source": "AI sheet ai-mouths-1 cell 3: keyed, scaled x0.5464 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours"
+  },
+  "mouth-talk-m": {
+   "file": "mouth-talk-m.png",
+   "type": "mouth",
+   "slots": [
+    "mouth"
+   ],
+   "w": 76,
+   "h": 86,
+   "anchor": [
+    38.326,
+    12.0
+   ],
+   "source": "AI sheet ai-mouths-1 cell 4: keyed, scaled x0.5464 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours"
+  },
+  "mouth-talk-l": {
+   "file": "mouth-talk-l.png",
+   "type": "mouth",
+   "slots": [
+    "mouth"
+   ],
+   "w": 67,
+   "h": 106,
+   "anchor": [
+    33.326,
+    12.0
+   ],
+   "source": "AI sheet ai-mouths-1 cell 5: keyed, scaled x0.5464 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours"
+  },
+  "mouth-sad": {
+   "file": "mouth-sad.png",
+   "type": "mouth",
+   "slots": [
+    "mouth"
+   ],
+   "w": 78,
+   "h": 65,
+   "anchor": [
+    39.326,
+    12.0
+   ],
+   "source": "AI sheet ai-mouths-1 cell 6: keyed, scaled x0.5408 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours"
+  },
+  "mouth-angry": {
+   "file": "mouth-angry.png",
+   "type": "mouth",
+   "slots": [
+    "mouth"
+   ],
+   "w": 95,
+   "h": 62,
+   "anchor": [
+    47.326,
+    12.0
+   ],
+   "source": "AI sheet ai-mouths-1 cell 7: keyed, scaled x0.5408 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours"
+  },
+  "mouth-o": {
+   "file": "mouth-o.png",
+   "type": "mouth",
+   "slots": [
+    "mouth"
+   ],
+   "w": 50,
+   "h": 88,
+   "anchor": [
+    25.326,
+    12.0
+   ],
+   "source": "AI sheet ai-mouths-1 cell 8: keyed, scaled x0.5464 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours"
+  },
+  "mouth-ee": {
+   "file": "mouth-ee.png",
+   "type": "mouth",
+   "slots": [
+    "mouth"
+   ],
+   "w": 123,
+   "h": 73,
+   "anchor": [
+    61.326,
+    12.0
+   ],
+   "source": "AI sheet ai-mouths-1 cell 9: keyed, scaled x0.5408 (AI nose/mouth width -> original), lines re-stroked at 6.49 px, straight philtrum, flat original colours"
+  }
+ },
+ "expressions": {
+  "neutral": {
+   "eyes": "eye-open",
+   "brows": "brow-neutral",
+   "mouth": "mouth-neutral"
+  },
+  "happy": {
+   "eyes": "eye-happy",
+   "brows": "brow-neutral",
+   "mouth": "mouth-smile-open"
+  },
+  "angry": {
+   "eyes": "eye-open",
+   "brows": "brow-angry",
+   "mouth": "mouth-angry"
+  },
+  "sad": {
+   "eyes": "eye-sad",
+   "brows": "brow-sad",
+   "mouth": "mouth-sad"
+  },
+  "scared": {
+   "eyes": "eye-surprised",
+   "brows": "brow-worried",
+   "mouth": "mouth-angry"
+  },
+  "surprised": {
+   "eyes": "eye-surprised",
+   "brows": "brow-raised",
+   "mouth": "mouth-o"
+  },
+  "blink": {
+   "eyes": "eye-blink",
+   "brows": "brow-neutral",
+   "mouth": "mouth-neutral"
+  },
+  "talk-s": {
+   "eyes": "eye-open",
+   "brows": "brow-neutral",
+   "mouth": "mouth-talk-s"
+  },
+  "talk-m": {
+   "eyes": "eye-open",
+   "brows": "brow-neutral",
+   "mouth": "mouth-talk-m"
+  },
+  "talk-l": {
+   "eyes": "eye-open",
+   "brows": "brow-neutral",
+   "mouth": "mouth-talk-l"
+  },
+  "talk-ee": {
+   "eyes": "eye-open",
+   "brows": "brow-neutral",
+   "mouth": "mouth-ee"
+  }
+ },
+ "metrics": {
+  "eyeDiameter": 97.32,
+  "eyeCentersMeasured": {
+   "L": [
+    395.487,
+    412.161
+   ],
+   "R": [
+    628.878,
+    412.119
+   ]
+  },
+  "eyeHighlights": [
+   {
+    "offset": [
+     -17.5,
+     -18.886
+    ],
+    "diameter": 27.63,
+    "color": [
+     254.0,
+     254.0,
+     254.0
+    ]
+   },
+   {
+    "offset": [
+     21.859,
+     21.022
+    ],
+    "diameter": 16.29,
+    "color": [
+     255.0,
+     254.0,
+     253.0
+    ]
+   }
+  ],
+  "eyeHighlightNote": "offsets from the eye centre; identical in both eyes (one image). The original left eye had a small BROWN dot (not white) at lower right ([20.21, 18.738] from its centre); both eyes now use the right eye's white one (the rule)",
+  "eyeSurprisedScale": 1.12,
+  "lineThickness": 6.49,
+  "lineThicknessNote": "original mouth line (philtrum) width = sum of alpha across the line; used for every re-stroked mouth line and the blink/happy eye lines",
+  "browThickness": 10.06,
+  "browLength": 43.15,
+  "browTiltDeg": {
+   "L": -10.82,
+   "R": 10.85,
+   "note": "angle of the outer->inner end axis, + = inner end lower (L brow)"
+  },
+  "browNote": "the original brows are thicker than the mouth line; all brow variants are the exact original brow (rotated/raised) so they keep its thickness",
+  "mouthWidth": 106.0,
+  "mouthBox": [
+   459,
+   461,
+   565,
+   501
+  ],
+  "noseSize": [
+   50,
+   30
+  ],
+  "noseBox": [
+   487,
+   431,
+   537,
+   461
+  ],
+  "colors": {
+   "eye": "#512313",
+   "hl_big": "#FEFEFE",
+   "hl_small": "#FFFEFD",
+   "line": "#A17F62",
+   "inside": "#512313",
+   "tongue": "#FCBDB6",
+   "brow": "#8E6C51",
+   "nose": "#AA8163",
+   "cream": "#FBF3DE",
+   "tan": "#ECC083",
+   "cheek": "#FCBDB6"
+  }
+ },
+ "blankHead": {
+  "method": "per-class Gaussian normalised convolution of the surrounding flat colours; tan forehead wedge continued under the nose",
+  "wedge_fit_rows": [
+   418,
+   427
+  ],
+  "wedge_left": [
+   0.1273,
+   436.6257
+  ],
+  "wedge_right": [
+   -0.1177,
+   583.9352
+  ],
+  "nose_erode_px": 3,
+  "hole_dilate_px": 3,
+  "nose_top": 431,
+  "nose_widest_row": 441
+ }
+}
