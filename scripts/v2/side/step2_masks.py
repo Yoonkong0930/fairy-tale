@@ -7,8 +7,8 @@ Output: art/v2/tori-side/step2-masks/<part>.png (L, 255 = part), labels.png, ove
         contact.png, parts.json, work/label_map.png, work/fg.png
 No AI images: every boundary is a colour edge of the original or a curve fitted to its silhouette.
 
-Parts: head, tuft, earNear, torso (incl. collar), pendant (acorn only), armNear, legNear, legFar, tail.
-  (earFar / armFar: not visible in cand3 -> no mask.)
+Parts: head, tuft, earNear, torso (incl. collar), pendant (acorn only), armNear, armFar (v2), legNear, legFar,
+  tail.  (earFar: not visible -> no mask.)
 Rules
   foreground : max(255-C) > 8, largest component, enclosed holes filled.
   armNear    : step-1 arm layer alpha >= 128 (the arm was composited by step 1, so its coverage is exact).
@@ -40,11 +40,13 @@ from scipy import ndimage as ndi
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 ORIG = ROOT / "art/v2/tori-side/original.png"
 ARM = ROOT / "art/v2/tori-side/step1-fix/work/arm_layer.png"
+FARARM = ROOT / "art/v2/tori-side/step1-fix/work/farArm_layer.png"
+NOFAR = ROOT / "art/v2/tori-side/step1-fix/work/original_no_farArm.png"
 OUT = ROOT / "art/v2/tori-side/step2-masks"
 WORK = OUT / "work"
-PARTS = ["head", "tuft", "earNear", "torso", "pendant", "armNear", "legNear", "legFar", "tail"]
+PARTS = ["head", "tuft", "earNear", "torso", "pendant", "armNear", "armFar", "legNear", "legFar", "tail"]
 COLORS = {"head": (255, 99, 71), "tuft": (255, 0, 255), "earNear": (255, 215, 0), "torso": (30, 144, 255),
-          "pendant": (0, 255, 200), "armNear": (255, 140, 0), "legNear": (0, 200, 0), "legFar": (220, 20, 60),
+          "pendant": (0, 255, 200), "armNear": (255, 140, 0), "armFar": (120, 60, 0), "legNear": (0, 200, 0), "legFar": (220, 20, 60),
           "tail": (139, 90, 255)}
 IDX = {p: i + 1 for i, p in enumerate(PARTS)}
 LEG_CUT = [(400, 872), (436, 880), (470, 894), (505, 902), (546, 905), (548, 905)]
@@ -102,6 +104,10 @@ def main():
 
     armA = np.asarray(Image.open(ARM))[..., 3]
     put("armNear", armA >= 128)
+    # far arm (v2): drawn behind the body -> visible where the step-1 image WITHOUT the far arm is background
+    farA = np.asarray(Image.open(FARARM))[..., 3]
+    nofar = np.asarray(Image.open(NOFAR).convert("RGB")).astype(np.int32)
+    put("armFar", (farA >= 128) & ((255 - nofar.min(2)) <= 8))
 
     win = (xx > 640) & (xx < 745) & (yy > 625) & (yy < 745)
     olive = (np.abs(R - G) < 22) & (B < 100) & (R < 170) & (G > 90)
@@ -206,7 +212,10 @@ def main():
     # torso = rest of body
     bodyrest = fg & (L == 0) & ~headc
     lab, n = ndi.label(ndi.binary_opening(bodyrest, disk(1)))
-    put("torso", lab == lab[780, 520])
+    # v2: the near arm now crosses the belly, so the torso visible area is split in pieces (main body +
+    # the cream / collar-shadow wedge between the arm, the collar and the acorn): every piece >= 40 px
+    sizes = ndi.sum(np.ones_like(lab), lab, range(1, n + 1))
+    put("torso", np.isin(lab, [i + 1 for i, sz in enumerate(sizes) if sz >= 40]))
 
     def fill_nearest():
         un = fg & (L == 0)
@@ -252,7 +261,8 @@ def main():
         "earNear": "inside the ellipse fitted to the ear's visible silhouette (vs background / dark head stripe); ear is in front of the head stripe; incl. inner oval and lower-rim crescent.",
         "torso": "body incl. collar band, collar-shadow band, belly; bounded by arm (step-1 layer), tail (back edge), hip cut and far leg colour edge.",
         "pendant": "acorn only (olive cap/stem + mint nut + highlights).",
-        "armNear": "step-1 arm layer, alpha >= 128.",
+        "armNear": "step-1 arm layer, alpha >= 128 (v2: forward, over the cream belly).",
+        "armFar": "step-1 far-arm layer alpha >= 128 where the step-1 image without the far arm is background (the far arm is behind the body and the acorn).",
         "legNear": "below the hip cut polyline LEG_CUT (belly-bottom contour continued to the back silhouette).",
         "legFar": "shade-coloured leg below the belly (colour edge vs torso tan/cream).",
         "tail": "left of the torso back edge (first non-fur pixel walking left, per row).",
@@ -266,7 +276,7 @@ def main():
         print(f"  {p:8s} {info[p]['bbox']} area={info[p]['area']} comps={info[p]['components']}")
     meta = {"source": "art/v2/tori-side/original.png", "canvas": [W, H], "foreground_px": int(fg.sum()),
             "partition_check": part, "ai_guides": "none", "geometry": geom, "parts": info,
-            "not_visible": {"earFar": "hidden behind the head in cand3", "armFar": "hidden behind the body in cand3"}}
+            "not_visible": {"earFar": "hidden behind the head in cand3"}}
     (OUT / "parts.json").write_text(json.dumps(meta, indent=1))
     previews(O, L, masks, info)
 

@@ -33,18 +33,18 @@ PUB = ROOT / "public/assets/characters/tori-v2-side"
 H = W = 1024
 GREEN, DARK = (0x6B, 0xBF, 0x59), (0x20, 0x20, 0x20)
 PAD = 2
-ORDER = ["tail", "legFar", "legNear", "torso", "pendant", "armNear", "collar_front", "tuft", "head", "earNear"]
+ORDER = ["tail", "legFar", "legNear", "armFar", "torso", "pendant", "armNear", "collar_front", "tuft", "head", "earNear"]
 PARENT = {"torso": "root", "legNear": "root", "legFar": "root",
-          "tail": "torso", "pendant": "torso", "armNear": "torso", "collar_front": "torso", "head": "torso",
+          "tail": "torso", "pendant": "torso", "armNear": "torso", "armFar": "torso", "collar_front": "torso", "head": "torso",
           "earNear": "head", "tuft": "head"}
 PIVOTS = {
     "torso": [559.0, 895.0], "legNear": [490.0, 896.0], "legFar": [628.0, 893.0], "tail": [458.0, 823.0],
-    "pendant": [686.0, 641.0], "armNear": [534.0, 662.0], "collar_front": [559.0, 895.0],
+    "pendant": [686.0, 641.0], "armNear": [612.0, 662.0], "armFar": [696.0, 703.0], "collar_front": [559.0, 895.0],
     "head": [565.0, 615.0], "earNear": [482.0, 228.0], "tuft": [581.0, 182.0],
 }
 LIMITS = {
     "torso": [-5, 5], "legNear": [-25, 25], "legFar": [-25, 25], "tail": [-10, 10], "pendant": [-10, 10],
-    "armNear": [-30, 30], "collar_front": [0, 0], "head": [-8, 8], "earNear": [-15, 15], "tuft": [-5, 5],
+    "armNear": [-30, 30], "armFar": [-20, 20], "collar_front": [0, 0], "head": [-8, 8], "earNear": [-15, 15], "tuft": [-5, 5],
 }
 PIVOT_NOTES = {
     "torso": "hip centre between the two hip pivots (lean / sway); legs are root children so the feet stay planted",
@@ -53,6 +53,7 @@ PIVOT_NOTES = {
     "tail": "centre of the step-4 tail-root disk (r 50) behind the torso's back edge",
     "pendant": "top of the acorn stem where it hangs from the collar",
     "armNear": "centre of the rounded shoulder end (step-4), under collar_front: ball-joint-like turn",
+    "armFar": "centre of the far arm's rounded shoulder, hidden behind the torso front / acorn (the far arm is drawn behind the torso)",
     "collar_front": "rigid part of the torso (same pivot, never rotated on its own; limits 0)",
     "head": "neck: above the collar, inside the step-4 neck fill, under the head's bottom edge",
     "earNear": "ear base where the ear's lower-right meets the head (the ear is drawn in front of the head)",
@@ -62,7 +63,8 @@ LIMIT_NOTES = {
     "legNear": "+-25 (walk). - = foot forward (right). The rounded hip shows as a small round bump at the back "
                "silhouette at -25.",
     "legFar": "+-25 (walk). - = foot forward (right). Behind torso and near leg.",
-    "armNear": "+-30 (walk swing). - = paw forward (right). The collar-shadow band on the arm top turns with the arm.",
+    "armNear": "+-30 (walk swing). - = paw forward/up (right): at -30 the forearm is level and passes in front of the acorn. The collar-shadow band on the arm top turns with the arm.",
+    "armFar": "+-20. Its base is the arm's own rounded top (complete render behind the torso), so no cut base can show; beyond +-20 the paw goes fully behind the belly (+) or up into the acorn (-).",
     "tail": "+-10: small (2-4 px) corner of the root fill / cream notch at the junction at the extremes; +-8 cleaner.",
     "head": "+-8: collar fill above the visible collar shows; a faint 1-px original collar-top edge row is visible.",
     "earNear": "+-15: turning reveals the head's back stripe continued under the ear (step-4 fill).",
@@ -73,7 +75,7 @@ LIMIT_NOTES = {
 }
 BOXES = {
     "torso": (100, 40, 880, 1000), "legNear": (360, 780, 760, 1000), "legFar": (360, 780, 760, 1000),
-    "tail": (100, 520, 560, 940), "pendant": (600, 590, 780, 770), "armNear": (400, 580, 700, 880),
+    "tail": (100, 520, 560, 940), "pendant": (600, 590, 780, 770), "armNear": (480, 580, 800, 880), "armFar": (600, 600, 820, 820),
     "head": (250, 40, 880, 720), "earNear": (380, 80, 600, 300), "tuft": (440, 40, 720, 260),
 }
 FULL = (100, 40, 880, 1000)
@@ -110,7 +112,7 @@ def build():
     rig = {
         "name": "tori-v2-side",
         "version": 1,
-        "view": "side (profile), facing screen-right; cand3 + step-1 fixes (eye highlights, near arm)",
+        "view": "side (profile), facing screen-right; cand3 + step-1 fixes (eye highlights, v2 arms: near arm forward over the belly, far arm peeking in front of the chest)",
         "canvas": [W, H],
         "units": front["units"],
         "angleConvention": front["angleConvention"] + "; facing right: negative leg / arm angles swing the foot / "
@@ -146,10 +148,10 @@ def thumb(R, pose, box, tw, bg):
 
 def combined_poses():
     return [
-        ("walk contact A: legNear -25 legFar +25, arm +30, tail +6, root dy 0",
-         {"legNear": -25, "legFar": 25, "armNear": 30, "tail": 6}),
-        ("walk contact B: legNear +25 legFar -25, arm -30, tail -6",
-         {"legNear": 25, "legFar": -25, "armNear": -30, "tail": -6}),
+        ("walk extreme: legNear -25 legFar +25, armNear +20, armFar -15, tail +5",
+         {"legNear": -25, "legFar": 25, "armNear": 20, "armFar": -15, "tail": 5}),
+        ("walk rest stride: legs 0, armNear -20, armFar +15, tail -5",
+         {"armNear": -20, "armFar": 15, "tail": -5}),
         ("head -8 + ear +15 + tuft +5", {"head": -8, "earNear": 15, "tuft": 5}),
         ("head +8 + ear -15 + tuft -5", {"head": 8, "earNear": -15, "tuft": -5}),
         ("lean: torso -5, head +5, arm -20, tail +8", {"torso": -5, "head": 5, "armNear": -20, "tail": 8}),
@@ -246,6 +248,7 @@ def walk_frames(n=8):
         pose = {
             "legNear": round(-12.5 + 12.5 * c, 2), "legFar": round(12.5 - 12.5 * c, 2),
             "armNear": round(-20 * c, 2),                                # opposite to the near leg
+            "armFar": round(15 * c, 2),                                  # opposite to the far leg (and the near arm)
             "root": {"dy": round(-6 * (1 - np.cos(2 * t)) / 2, 2)},      # low at contact, up 6 px at passing
             "tail": round(5 * np.cos(2 * t), 2),                         # counter-sway against the bob
             "head": round(-1.5 * np.cos(2 * t), 2), "pendant": round(4 * np.sin(t), 2),
@@ -276,12 +279,14 @@ def walk_sheet(R, path):
     # second row: dark bg
     sheet = Image.new("RGB", (len(ims) * (TW + 6) + 6, 2 * (ims[0][2].height + 46) + 50), (245, 245, 245))
     dr = ImageDraw.Draw(sheet)
-    dr.text((8, 8), "Tori v2 SIDE - walk cycle test (8 frames, legs opposite over their 25 deg range, arm +-20 opposite to the near leg, "
-                    "root bob 6 px, tail counter-sway +-5, head +-1.5, pendant +-4; f0 = drawn rest = contact A, f4 = contact B)", fill=(0, 0, 0), font=F5.font(15))
+    dr.text((8, 4), "Tori v2 SIDE - walk cycle test (8 frames): legs near/far opposite over their 25 deg range; arms near/far "
+                    "+-20/+-15, each opposite to its own leg", fill=(0, 0, 0), font=F5.font(14))
+    dr.text((8, 18), "root bob 6 px, tail counter-sway +-5, head +-1.5, pendant +-4; f0 = drawn rest stride = contact A, "
+                    "f4 = contact B", fill=(0, 0, 0), font=F5.font(12))
     for k, pose, g in ims:
         x = 6 + k * (TW + 6)
-        dr.text((x, 30), f"f{k}: near {pose['legNear']:+.0f} far {pose['legFar']:+.0f} arm {pose['armNear']:+.0f} "
-                         f"dy {pose['root']['dy']:+.1f}", fill=(0, 0, 0), font=F5.font(11))
+        dr.text((x, 30), f"f{k} legs {pose['legNear']:+.0f}/{pose['legFar']:+.0f} arms {pose['armNear']:+.0f}/"
+                         f"{pose['armFar']:+.0f} dy {pose['root']['dy']:+.0f}", fill=(0, 0, 0), font=F5.font(11))
         sheet.paste(g, (x, 46))
         dk, _ = thumb(R, pose, box, TW, DARK)
         sheet.paste(dk, (x, 46 + g.height + 8))
@@ -313,7 +318,7 @@ def main():
     walk = walk_sheet(R, OUT / "walk-cycle.png")
     rig = json.loads((OUT / "rig.json").read_text())
     rig["checks"] = {"rest": checks, "range_test": stats, "combined_poses": combo,
-                     "walk": {"frames": walk, "formula": "t=2*pi*k/8: legNear=-12.5+12.5 cos t, legFar=12.5-12.5 cos t, armNear=-20 cos t, "
+                     "walk": {"frames": walk, "formula": "t=2*pi*k/8: legNear=-12.5+12.5 cos t, legFar=12.5-12.5 cos t, armNear=-20 cos t, armFar=+15 cos t, "
                                                          "root.dy=-6(1-cos 2t)/2, tail=5 cos 2t, head=-1.5 cos 2t, pendant=4 sin t; "
                                                          "f0 = drawn rest stride = contact A, f4 = contact B"}}
     (OUT / "rig.json").write_text(json.dumps(rig, indent=1, ensure_ascii=False))

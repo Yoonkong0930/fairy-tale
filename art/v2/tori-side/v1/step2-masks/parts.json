@@ -1,0 +1,255 @@
+{
+ "source": "art/v2/tori-side/original.png",
+ "canvas": [
+  1024,
+  1024
+ ],
+ "foreground_px": 359554,
+ "partition_check": {
+  "overlap_px": 0,
+  "unassigned_fg_px": 0,
+  "mask_px_in_background": 0
+ },
+ "ai_guides": "none",
+ "geometry": {
+  "ear_inner_oval_centre": [
+   483.1,
+   182.4
+  ],
+  "head_ellipse_points_used": 476,
+  "ear_points_used": 205,
+  "torso_back_edge_xy": [
+   [
+    450,
+    660
+   ],
+   [
+    446,
+    670
+   ],
+   [
+    442,
+    680
+   ],
+   [
+    438,
+    690
+   ],
+   [
+    434,
+    700
+   ],
+   [
+    431,
+    710
+   ],
+   [
+    427,
+    720
+   ],
+   [
+    424,
+    730
+   ],
+   [
+    421,
+    740
+   ],
+   [
+    419,
+    750
+   ],
+   [
+    417,
+    760
+   ],
+   [
+    416,
+    770
+   ],
+   [
+    415,
+    780
+   ],
+   [
+    415,
+    790
+   ],
+   [
+    416,
+    800
+   ],
+   [
+    417,
+    810
+   ],
+   [
+    419,
+    820
+   ],
+   [
+    422,
+    830
+   ],
+   [
+    424,
+    840
+   ],
+   [
+    430,
+    850
+   ],
+   [
+    437,
+    860
+   ],
+   [
+    443,
+    870
+   ],
+   [
+    442,
+    880
+   ],
+   [
+    440,
+    890
+   ],
+   [
+    438,
+    900
+   ]
+  ],
+  "leg_cut": [
+   [
+    400,
+    872
+   ],
+   [
+    436,
+    880
+   ],
+   [
+    470,
+    894
+   ],
+   [
+    505,
+    902
+   ],
+   [
+    546,
+    905
+   ],
+   [
+    548,
+    905
+   ]
+  ]
+ },
+ "parts": {
+  "head": {
+   "bbox": [
+    307,
+    150,
+    831,
+    630
+   ],
+   "area": 190875,
+   "components": 1,
+   "note": "head disc incl. stripes, face, cheek, bottom band; ear (in front) and tuft (outside the fitted head ellipse) removed; collar boundary = brown colour edge."
+  },
+  "tuft": {
+   "bbox": [
+    502,
+    71,
+    676,
+    170
+   ],
+   "area": 9828,
+   "components": 1,
+   "note": "head-component pixels outside the head ellipse in the tuft window (x478-700, y<205), ear excluded."
+  },
+  "earNear": {
+   "bbox": [
+    422,
+    116,
+    515,
+    244
+   ],
+   "area": 9279,
+   "components": 1,
+   "note": "inside the ellipse fitted to the ear's visible silhouette (vs background / dark head stripe); ear is in front of the head stripe; incl. inner oval and lower-rim crescent."
+  },
+  "torso": {
+   "bbox": [
+    415,
+    613,
+    708,
+    910
+   ],
+   "area": 57581,
+   "components": 1,
+   "note": "body incl. collar band, collar-shadow band, belly; bounded by arm (step-1 layer), tail (back edge), hip cut and far leg colour edge."
+  },
+  "pendant": {
+   "bbox": [
+    662,
+    640,
+    733,
+    732
+   ],
+   "area": 4397,
+   "components": 1,
+   "note": "acorn only (olive cap/stem + mint nut + highlights)."
+  },
+  "armNear": {
+   "bbox": [
+    496,
+    653,
+    632,
+    819
+   ],
+   "area": 12671,
+   "components": 1,
+   "note": "step-1 arm layer, alpha >= 128."
+  },
+  "legNear": {
+   "bbox": [
+    429,
+    882,
+    550,
+    976
+   ],
+   "area": 6959,
+   "components": 1,
+   "note": "below the hip cut polyline LEG_CUT (belly-bottom contour continued to the back silhouette)."
+  },
+  "legFar": {
+   "bbox": [
+    590,
+    855,
+    721,
+    967
+   ],
+   "area": 7745,
+   "components": 1,
+   "note": "shade-coloured leg below the belly (colour edge vs torso tan/cream)."
+  },
+  "tail": {
+   "bbox": [
+    130,
+    565,
+    444,
+    878
+   ],
+   "area": 60219,
+   "components": 1,
+   "note": "left of the torso back edge (first non-fur pixel walking left, per row)."
+  }
+ },
+ "not_visible": {
+  "earFar": "hidden behind the head in cand3",
+  "armFar": "hidden behind the body in cand3"
+ }
+}

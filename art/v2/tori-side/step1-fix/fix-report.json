@@ -55,33 +55,78 @@
    ]
   ]
  },
- "arm": {
+ "farArm": {
   "ai_source": "work/ai_arm_green_e.png",
   "transform": {
-   "s": 0.29,
-   "rot": -2.0,
+   "s": 0.14,
+   "rot": -30.0,
    "src": [
     405,
     290
    ],
    "dst": [
-    530,
-    661
+    692,
+    702
    ],
-   "offset": [
-    50,
-    -60
+   "shade_ai": [
+    36,
+    105
+   ]
+  },
+  "colours": {
+   "fill": [
+    205,
+    148,
+    100
+   ],
+   "shade": [
+    188,
+    132,
+    88
+   ],
+   "band": [
+    0,
+    0,
+    0
+   ]
+  },
+  "drawn_px": 3404,
+  "visible_px(cov>=0.5)": 1705,
+  "bbox_drawn_x0y0x1y1": [
+   678,
+   686,
+   767,
+   756
+  ],
+  "note": "behind the body and the acorn; only forearm + paw visible in front of the belly line"
+ },
+ "arm": {
+  "ai_source": "work/ai_arm_green_e.png",
+  "transform": {
+   "s": 0.33,
+   "rot": -8.0,
+   "src": [
+    405,
+    290
+   ],
+   "dst": [
+    608,
+    662
+   ],
+   "shade_ai": [
+    24,
+    70
    ]
   },
   "bbox": [
-   496,
-   653,
-   632,
-   819
+   572,
+   663,
+   739,
+   832
   ],
-  "opaque_px": 12417,
-  "coverage_px": 12875,
-  "shade_band_px": 4069,
+  "opaque_px": 15691,
+  "coverage_px": 16212,
+  "shade_band_px": 2763,
   "colours": {
    "tan": [
     235,
@@ -89,9 +134,9 @@
     130
    ],
    "shade/band": [
-    205,
-    148,
-    100
+    207,
+    147,
+    97
    ],
    "front_arm_ref": {
     "tan": [
@@ -116,8 +161,8 @@
    1.424491276379213,
    247.46079362650784
   ],
-  "paw_over_cream_px": 734
+  "paw_over_cream_px": 11765
  },
- "changed_px_total": 18141,
- "changed_px_outside(eye|line|arm)": 0
+ "changed_px_total": 24667,
+ "changed_px_outside(eye|line|arm|farArm)": 0
 }

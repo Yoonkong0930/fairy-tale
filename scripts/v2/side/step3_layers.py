@@ -15,6 +15,9 @@ step-1 arm layer (coverage AA kept), and the torso layer gets the step-1 body pi
 arm) under the arm's soft-edge pixels, so arm-over-torso reproduces the original exactly and no
 arm-AA seam is baked into the torso (front step-4 lesson applied up front).  These torso pixels are
 "hidden" (fully under/inside the arm's coverage), the visible result is unchanged.
+v2: armFar = exact step-1 far-arm layer, kept where it is not under an opaque front layer; every other
+silhouette is de-whitened on step1-fix/work/original_no_farArm.png (so the belly / acorn edges over the far
+arm get their true alpha); work/torso_full.png = arm-less torso for the step-4 fills.
 Pendant glow: checked - the belly around the acorn has no glow in cand3 (torso px within 4..14 px of the
 acorn are within 6 levels of the flat cream / collar / band colours), so nothing is removed.
 """
@@ -31,12 +34,13 @@ ORIG = ROOT / "art/v2/tori-side/original.png"
 MASKS = ROOT / "art/v2/tori-side/step2-masks"
 S1 = ROOT / "art/v2/tori-side/step1-fix/work"
 OUT = ROOT / "art/v2/tori-side/step3-layers"
-PARTS = ["head", "tuft", "earNear", "torso", "pendant", "armNear", "legNear", "legFar", "tail"]
-STACK = ["tail", "legFar", "legNear", "torso", "pendant", "armNear", "tuft", "head", "earNear"]
+PARTS = ["head", "tuft", "earNear", "torso", "pendant", "armNear", "armFar", "legNear", "legFar", "tail"]
+STACK = ["tail", "legFar", "legNear", "armFar", "torso", "pendant", "armNear", "tuft", "head", "earNear"]
 REASONS = {
     "tail": "behind everything: it touches only the torso's back edge (its shade / stripe / cream bands go behind the body).",
     "legFar": "far leg: behind the body and behind the near leg (darker, it disappears under the belly).",
     "legNear": "behind the torso: the near leg's fur continues the torso's fur, the hip end will be hidden under the belly bottom.",
+    "armFar": "far arm (v2): behind the torso (and the acorn); only its forearm + paw show in front of the belly line.",
     "torso": "body incl. collar; over the legs and tail, under the arm, pendant and head.",
     "pendant": "hangs on the collar front: in front of the torso.",
     "armNear": "near arm lies on the body side: in front of the torso (its top is tucked under the collar -> collar_front in step 5).",
@@ -45,7 +49,7 @@ REASONS = {
     "earNear": "in front of the head: the ear covers the head's back stripe.",
 }
 COLORS = {"head": (255, 99, 71), "tuft": (255, 0, 255), "earNear": (255, 215, 0), "torso": (30, 144, 255),
-          "pendant": (0, 255, 200), "armNear": (255, 140, 0), "legNear": (0, 200, 0), "legFar": (220, 20, 60),
+          "pendant": (0, 255, 200), "armNear": (255, 140, 0), "armFar": (120, 60, 0), "legNear": (0, 200, 0), "legFar": (220, 20, 60),
           "tail": (139, 90, 255)}
 DARK, GREEN = (0x20, 0x20, 0x20), (0x6B, 0xBF, 0x59)
 
@@ -63,6 +67,18 @@ def composite(layers, bg, order):
     return out
 
 
+def light_fix(img, part, rgb, alpha, level):
+    """v2: on LIGHT (cream) silhouettes the white-blend projection is ill-conditioned (cream ~ white), so the
+    2nd/3rd band rows get noisy alpha (e.g. 255 / 227 / 243) that shows as dark dots over a dark background.
+    There (torso only), rows >= 2 px deep whose colour is the flat belly cream (within 10 levels) are taken
+    as opaque art (alpha 1, original colour); the outermost row keeps its soft alpha."""
+    cream = np.array([249.0, 241.0, 220.0])
+    m = part & (level >= 2) & (level <= 3) & (np.abs(img - cream).max(2) <= 10) & (alpha < 1)
+    alpha = alpha.copy(); rgb = rgb.copy()
+    alpha[m] = 1.0; rgb[m] = img[m]
+    return rgb, alpha, int(m.sum())
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     O = np.asarray(Image.open(ORIG).convert("RGB")).astype(float)
@@ -72,7 +88,20 @@ def main():
         assert not (fg & m).any(); fg |= m
     bg = ~fg
     arm = np.asarray(Image.open(S1 / "arm_layer.png").convert("RGBA")).copy()
+    far = np.asarray(Image.open(S1 / "farArm_layer.png").convert("RGBA")).copy()
     body = np.asarray(Image.open(S1 / "body_under_arm.png").convert("RGB")).astype(float)
+    # v2: silhouettes are de-whitened on the step-1 image WITHOUT the far arm (they must see white there)
+    Odw = np.asarray(Image.open(S1 / "original_no_farArm.png").convert("RGB")).astype(float)
+    # full torso (incl. the parts under both arms) de-whitened on the arm-less body image: used for the
+    # torso px under the near arm's soft edge here and for the step-4 fill under the arms
+    bfg = (255 - body.min(2)) > 8
+    tfull_part = bfg & (masks["torso"] | masks["armNear"] | masks["armFar"])
+    tf_rgb, tf_a, tf_lv = F3.dewhite(body, tfull_part, ~bfg)
+    tf_rgb, tf_a, _ = light_fix(body, tfull_part, tf_rgb, tf_a, tf_lv)
+    tf8 = np.round(tf_a * 255).astype(np.uint8); tf8[~tfull_part] = 0
+    tfull = np.dstack([np.round(np.clip(tf_rgb, 0, 255)).astype(np.uint8), tf8]); tfull[tf8 == 0, :3] = 0
+    (OUT / "work").mkdir(exist_ok=True)
+    Image.fromarray(tfull, "RGBA").save(OUT / "work" / "torso_full.png")
 
     # glow check around the acorn
     dp = ndi.distance_transform_edt(~masks["pendant"])
@@ -83,26 +112,68 @@ def main():
             "px_greenish(G>R)": int((O[ring][:, 1] > O[ring][:, 0]).sum())}
     print("glow check", glow)
 
+    # de-whitening masks on Odw: px labelled armFar that are foreground in Odw (acorn / belly AA that lay
+    # over the far arm) go back to the nearest other part, so that part's edge alpha is solved there
+    fgdw = (255 - Odw.min(2)) > 8
+    others = np.zeros(O.shape[:2], np.int32)
+    for i, p in enumerate(PARTS):
+        if p != "armFar":
+            others[masks[p]] = i + 1
+    give = masks["armFar"] & fgdw
+    _, (iy, ix) = ndi.distance_transform_edt(others == 0, return_indices=True)
+    dwmask = {p: masks[p].copy() for p in PARTS}
+    for i, p in enumerate(PARTS):
+        if p != "armFar":
+            dwmask[p] |= give & (others[iy, ix] == i + 1)
+    bgdw = ~np.any([dwmask[p] for p in PARTS if p != "armFar"], 0)
     layers, info = {}, {}
+    light_fixed = {}
     for p in PARTS:
         if p == "armNear":
             L = arm.copy()
             level = np.zeros(O.shape[:2], np.uint8)
+        elif p == "armFar":
+            L = far.copy()                      # trimmed below to the px not hidden by opaque front layers
+            level = np.zeros(O.shape[:2], np.uint8)
         else:
-            rgb, alpha, level = F3.dewhite(O, masks[p], bg)
-            a8 = np.round(alpha * 255).astype(np.uint8); a8[~masks[p]] = 0
+            rgb, alpha, level = F3.dewhite(Odw, dwmask[p], bgdw)
+            if p == "torso":
+                rgb, alpha, nfix = light_fix(Odw, dwmask[p], rgb, alpha, level)
+                light_fixed[p] = nfix
+            a8 = np.round(alpha * 255).astype(np.uint8); a8[~dwmask[p]] = 0
             rgb8 = np.round(np.clip(rgb, 0, 255)).astype(np.uint8); rgb8[a8 == 0] = 0
             L = np.dstack([rgb8, a8])
         layers[p] = L
-    # torso under the arm's soft edge: body pixels (exact un-mix of the step-1 composite)
+    # torso under the near arm's soft edge: the arm-less torso (exact un-mix of the step-1 composite)
     soft = ((arm[..., 3] > 0) | masks["armNear"]) & (arm[..., 3] < 255)
     T = layers["torso"]
-    T[soft, :3] = np.round(body[soft]).astype(np.uint8); T[soft, 3] = 255
+    T[soft] = tfull[soft]
+    # far arm: keep only the px some part of which can show (not under opaque torso / pendant / near arm)
+    front = (T[..., 3] == 255) | (layers["pendant"][..., 3] == 255) | (layers["armNear"][..., 3] == 255)
+    FA = layers["armFar"]
+    FA[front] = 0
+    # triple junction acorn tip / belly edge / far arm: px whose mix the two-layer model cannot explain
+    # (> 8 off): pendant AA dropped there; a soft belly px keeps its arm-less colour/alpha and the far arm takes
+    # the exact remainder; an opaque belly px takes the exact original colour
+    w0 = composite(layers, (255, 255, 255), STACK)
+    badj = (np.abs(np.round(w0) - O).max(2) > 8) & fg & (far[..., 3] > 0)
+    layers["pendant"][badj] = 0
+    for y, x in zip(*np.nonzero(badj)):
+        ta = tfull[y, x, 3] / 255.0
+        if 0 < ta < 0.95:                         # torso keeps its own soft edge, the far arm takes the rest
+            layers["torso"][y, x] = tfull[y, x]
+            c = (O[y, x] - ta * tfull[y, x, :3]) / (1 - ta)
+            layers["armFar"][y, x, :3] = np.clip(np.round(c), 0, 255); layers["armFar"][y, x, 3] = 255
+        else:                                     # opaque belly px: exact original colour (keeps the rest pose;
+            layers["torso"][y, x, :3] = O[y, x]; layers["torso"][y, x, 3] = 255   # a few px of far-arm AA stay on the
+            layers["armFar"][y, x] = 0                                             # belly edge when the far arm turns)
+    junction_fix = int(badj.sum())
+    print("junction px taken by armFar:", junction_fix)
     for p in PARTS:
         Image.fromarray(layers[p], "RGBA").save(OUT / f"{p}.png")
         a8 = layers[p][..., 3]
         ys, xs = np.nonzero(a8)
-        lv = F3.outer_band(masks[p], bg) if p != "armNear" else np.zeros_like(a8)
+        lv = F3.outer_band(masks[p], bg) if p not in ("armNear", "armFar") else np.zeros_like(a8)
         info[p] = {"bbox": [int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1],
                    "area_px": int(masks[p].sum()), "outer_edge_px": int((masks[p] & (lv > 0)).sum()),
                    "soft_alpha_px": int(((a8 > 0) & (a8 < 255)).sum())}
@@ -123,7 +194,8 @@ def main():
              "draw_order_back_to_front": STACK,
              "layers": {p: {"z": STACK.index(p), "file": f"{p}.png", **info[p], "why": REASONS[p]} for p in STACK},
              "edge_alpha": "front method (scripts/v2/step3_layers.py dewhite); armNear = exact step-1 arm layer",
-             "glow_check": glow, "recomposite_white_vs_original": stats}
+             "glow_check": glow, "recomposite_white_vs_original": stats,
+             "farArm_junction_px_exact": junction_fix, "light_edge_rows_made_opaque": light_fixed}
     (OUT / "stack-order.json").write_text(json.dumps(order, indent=1))
     # contact
     cell, pad, cols = 300, 8, 3

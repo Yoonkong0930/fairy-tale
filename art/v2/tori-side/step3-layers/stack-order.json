@@ -9,6 +9,7 @@
   "tail",
   "legFar",
   "legNear",
+  "armFar",
   "torso",
   "pendant",
   "armNear",
@@ -59,22 +60,36 @@
    "soft_alpha_px": 897,
    "why": "behind the torso: the near leg's fur continues the torso's fur, the hip end will be hidden under the belly bottom."
   },
-  "torso": {
+  "armFar": {
    "z": 3,
+   "file": "armFar.png",
+   "bbox": [
+    699,
+    713,
+    767,
+    756
+   ],
+   "area_px": 1729,
+   "outer_edge_px": 0,
+   "soft_alpha_px": 129,
+   "why": "far arm (v2): behind the torso (and the acorn); only its forearm + paw show in front of the belly line."
+  },
+  "torso": {
+   "z": 4,
    "file": "torso.png",
    "bbox": [
     415,
     613,
-    708,
+    707,
     910
    ],
-   "area_px": 57581,
-   "outer_edge_px": 1229,
-   "soft_alpha_px": 1121,
+   "area_px": 56177,
+   "outer_edge_px": 913,
+   "soft_alpha_px": 734,
    "why": "body incl. collar; over the legs and tail, under the arm, pendant and head."
   },
   "pendant": {
-   "z": 4,
+   "z": 5,
    "file": "pendant.png",
    "bbox": [
     662,
@@ -82,27 +97,27 @@
     733,
     732
    ],
-   "area_px": 4397,
-   "outer_edge_px": 496,
-   "soft_alpha_px": 448,
+   "area_px": 4352,
+   "outer_edge_px": 369,
+   "soft_alpha_px": 433,
    "why": "hangs on the collar front: in front of the torso."
   },
   "armNear": {
-   "z": 5,
+   "z": 6,
    "file": "armNear.png",
    "bbox": [
-    496,
-    653,
-    632,
-    819
+    572,
+    663,
+    739,
+    832
    ],
-   "area_px": 12671,
+   "area_px": 16046,
    "outer_edge_px": 0,
-   "soft_alpha_px": 458,
+   "soft_alpha_px": 521,
    "why": "near arm lies on the body side: in front of the torso (its top is tucked under the collar -> collar_front in step 5)."
   },
   "tuft": {
-   "z": 6,
+   "z": 7,
    "file": "tuft.png",
    "bbox": [
     502,
@@ -116,7 +131,7 @@
    "why": "behind the head (front decision: flat tuft behind the head, base extended under it in step 5)."
   },
   "head": {
-   "z": 7,
+   "z": 8,
    "file": "head.png",
    "bbox": [
     307,
@@ -124,13 +139,13 @@
     831,
     630
    ],
-   "area_px": 190875,
-   "outer_edge_px": 4426,
-   "soft_alpha_px": 3670,
+   "area_px": 190874,
+   "outer_edge_px": 4425,
+   "soft_alpha_px": 3669,
    "why": "head's lower band overlaps the collar -> in front of the torso."
   },
   "earNear": {
-   "z": 8,
+   "z": 9,
    "file": "earNear.png",
    "bbox": [
     422,
@@ -146,16 +161,20 @@
  },
  "edge_alpha": "front method (scripts/v2/step3_layers.py dewhite); armNear = exact step-1 arm layer",
  "glow_check": {
-  "ring_px": 1582,
-  "px_dev_gt6_from_flat_colours": 152,
+  "ring_px": 971,
+  "px_dev_gt6_from_flat_colours": 174,
   "px_greenish(G>R)": 0
  },
  "recomposite_white_vs_original": {
-  "max": 8,
-  "mean": 0.1167,
-  "px_diff_gt2": 7156,
-  "max_inside_fg_off_soft_edges": 0,
+  "max": 22,
+  "mean": 0.1151,
+  "px_diff_gt2": 6919,
+  "max_inside_fg_off_soft_edges": 4,
   "max_in_background": 8,
-  "max_under_arm_edge": 1
+  "max_under_arm_edge": 7
+ },
+ "farArm_junction_px_exact": 24,
+ "light_edge_rows_made_opaque": {
+  "torso": 200
  }
 }

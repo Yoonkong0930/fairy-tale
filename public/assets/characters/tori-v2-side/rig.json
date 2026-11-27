@@ -1,7 +1,7 @@
 {
  "name": "tori-v2-side",
  "version": 1,
- "view": "side (profile), facing screen-right; cand3 + step-1 fixes (eye highlights, near arm)",
+ "view": "side (profile), facing screen-right; cand3 + step-1 fixes (eye highlights, v2 arms: near arm forward over the belly, far arm peeking in front of the chest)",
  "canvas": [
   1024,
   1024
@@ -28,6 +28,7 @@
   "tail",
   "legFar",
   "legNear",
+  "armFar",
   "torso",
   "pendant",
   "armNear",
@@ -94,6 +95,25 @@
    "pivotNote": "centre of the step-4 hip disk (r 54) under the belly: the leg's top is round about this point",
    "limitsNote": "+-25 (walk). - = foot forward (right). The rounded hip shows as a small round bump at the back silhouette at -25."
   },
+  "armFar": {
+   "file": "armFar.png",
+   "x": 676,
+   "y": 684,
+   "w": 93,
+   "h": 74,
+   "pivot": [
+    696.0,
+    703.0
+   ],
+   "parent": "torso",
+   "z": 3,
+   "limits": {
+    "minDeg": -20,
+    "maxDeg": 20
+   },
+   "pivotNote": "centre of the far arm's rounded shoulder, hidden behind the torso front / acorn (the far arm is drawn behind the torso)",
+   "limitsNote": "+-20. Its base is the arm's own rounded top (complete render behind the torso), so no cut base can show; beyond +-20 the paw goes fully behind the belly (+) or up into the acorn (-)."
+  },
   "torso": {
    "file": "torso.png",
    "x": 412,
@@ -105,7 +125,7 @@
     895.0
    ],
    "parent": "root",
-   "z": 3,
+   "z": 4,
    "limits": {
     "minDeg": -5,
     "maxDeg": 5
@@ -116,15 +136,15 @@
   "pendant": {
    "file": "pendant.png",
    "x": 659,
-   "y": 637,
+   "y": 638,
    "w": 76,
-   "h": 97,
+   "h": 96,
    "pivot": [
     686.0,
     641.0
    ],
    "parent": "torso",
-   "z": 4,
+   "z": 5,
    "limits": {
     "minDeg": -10,
     "maxDeg": 10
@@ -134,35 +154,35 @@
   },
   "armNear": {
    "file": "armNear.png",
-   "x": 494,
-   "y": 628,
-   "w": 140,
-   "h": 193,
+   "x": 570,
+   "y": 625,
+   "w": 171,
+   "h": 209,
    "pivot": [
-    534.0,
+    612.0,
     662.0
    ],
    "parent": "torso",
-   "z": 5,
+   "z": 6,
    "limits": {
     "minDeg": -30,
     "maxDeg": 30
    },
    "pivotNote": "centre of the rounded shoulder end (step-4), under collar_front: ball-joint-like turn",
-   "limitsNote": "+-30 (walk swing). - = paw forward (right). The collar-shadow band on the arm top turns with the arm."
+   "limitsNote": "+-30 (walk swing). - = paw forward/up (right): at -30 the forearm is level and passes in front of the acorn. The collar-shadow band on the arm top turns with the arm."
   },
   "collar_front": {
    "file": "collar_front.png",
-   "x": 468,
-   "y": 617,
-   "w": 150,
-   "h": 53,
+   "x": 558,
+   "y": 618,
+   "w": 120,
+   "h": 78,
    "pivot": [
     559.0,
     895.0
    ],
    "parent": "torso",
-   "z": 6,
+   "z": 7,
    "limits": {
     "minDeg": 0,
     "maxDeg": 0
@@ -180,7 +200,7 @@
     182.0
    ],
    "parent": "head",
-   "z": 7,
+   "z": 8,
    "limits": {
     "minDeg": -5,
     "maxDeg": 5
@@ -199,7 +219,7 @@
     615.0
    ],
    "parent": "torso",
-   "z": 8,
+   "z": 9,
    "limits": {
     "minDeg": -8,
     "maxDeg": 8
@@ -218,7 +238,7 @@
     228.0
    ],
    "parent": "head",
-   "z": 9,
+   "z": 10,
    "limits": {
     "minDeg": -15,
     "maxDeg": 15
@@ -311,12 +331,12 @@
    },
    "legFar": {
     "-25": {
-     "new_crack_px": 22,
+     "new_crack_px": 30,
      "new_hole_px": 0,
      "closed_off_background_pocket_px": 0
     },
     "25": {
-     "new_crack_px": 21,
+     "new_crack_px": 23,
      "new_hole_px": 0,
      "closed_off_background_pocket_px": 0
     }
@@ -328,32 +348,44 @@
      "closed_off_background_pocket_px": 0
     },
     "25": {
-     "new_crack_px": 13,
+     "new_crack_px": 15,
      "new_hole_px": 0,
      "closed_off_background_pocket_px": 0
     }
    },
+   "armFar": {
+    "-20": {
+     "new_crack_px": 21,
+     "new_hole_px": 1,
+     "closed_off_background_pocket_px": 0
+    },
+    "20": {
+     "new_crack_px": 23,
+     "new_hole_px": 0,
+     "closed_off_background_pocket_px": 1
+    }
+   },
    "torso": {
     "-5": {
-     "new_crack_px": 63,
-     "new_hole_px": 21,
-     "closed_off_background_pocket_px": 5
+     "new_crack_px": 98,
+     "new_hole_px": 31,
+     "closed_off_background_pocket_px": 6
     },
     "5": {
-     "new_crack_px": 51,
-     "new_hole_px": 1,
-     "closed_off_background_pocket_px": 18
+     "new_crack_px": 89,
+     "new_hole_px": 24,
+     "closed_off_background_pocket_px": 15
     }
    },
    "pendant": {
     "-10": {
-     "new_crack_px": 28,
-     "new_hole_px": 10,
+     "new_crack_px": 7,
+     "new_hole_px": 9,
      "closed_off_background_pocket_px": 0
     },
     "10": {
-     "new_crack_px": 5,
-     "new_hole_px": 1,
+     "new_crack_px": 6,
+     "new_hole_px": 2,
      "closed_off_background_pocket_px": 0
     }
    },
@@ -408,14 +440,14 @@
   },
   "combined_poses": [
    {
-    "pose": "walk contact A: legNear -25 legFar +25, arm +30, tail +6, root dy 0",
+    "pose": "walk extreme: legNear -25 legFar +25, armNear +20, armFar -15, tail +5",
     "new_hole_px": 0,
-    "closed_off_background_pocket_px": 5
+    "closed_off_background_pocket_px": 19
    },
    {
-    "pose": "walk contact B: legNear +25 legFar -25, arm -30, tail -6",
+    "pose": "walk rest stride: legs 0, armNear -20, armFar +15, tail -5",
     "new_hole_px": 0,
-    "closed_off_background_pocket_px": 3
+    "closed_off_background_pocket_px": 4
    },
    {
     "pose": "head -8 + ear +15 + tuft +5",
@@ -429,13 +461,13 @@
    },
    {
     "pose": "lean: torso -5, head +5, arm -20, tail +8",
-    "new_hole_px": 0,
-    "closed_off_background_pocket_px": 27
+    "new_hole_px": 4,
+    "closed_off_background_pocket_px": 14
    },
    {
     "pose": "squash: torso sy 0.97 sx 1.02 (breath), legs +-10",
-    "new_hole_px": 0,
-    "closed_off_background_pocket_px": 49
+    "new_hole_px": 16,
+    "closed_off_background_pocket_px": 32
    }
   ],
   "walk": {
@@ -446,6 +478,7 @@
       "legNear": 0.0,
       "legFar": 0.0,
       "armNear": -20.0,
+      "armFar": 15.0,
       "root": {
        "dy": -0.0
       },
@@ -454,7 +487,7 @@
       "pendant": 0.0
      },
      "new_hole_px": 0,
-     "new_crack_px": 158
+     "new_crack_px": 166
     },
     {
      "frame": 1,
@@ -462,6 +495,7 @@
       "legNear": -3.66,
       "legFar": 3.66,
       "armNear": -14.14,
+      "armFar": 10.61,
       "root": {
        "dy": -3.0
       },
@@ -470,7 +504,7 @@
       "pendant": 2.83
      },
      "new_hole_px": 0,
-     "new_crack_px": 20
+     "new_crack_px": 27
     },
     {
      "frame": 2,
@@ -478,6 +512,7 @@
       "legNear": -12.5,
       "legFar": 12.5,
       "armNear": -0.0,
+      "armFar": 0.0,
       "root": {
        "dy": -6.0
       },
@@ -485,8 +520,8 @@
       "head": 1.5,
       "pendant": 4.0
      },
-     "new_hole_px": 0,
-     "new_crack_px": 190
+     "new_hole_px": 1,
+     "new_crack_px": 186
     },
     {
      "frame": 3,
@@ -494,6 +529,7 @@
       "legNear": -21.34,
       "legFar": 21.34,
       "armNear": 14.14,
+      "armFar": -10.61,
       "root": {
        "dy": -3.0
       },
@@ -502,7 +538,7 @@
       "pendant": 2.83
      },
      "new_hole_px": 0,
-     "new_crack_px": 35
+     "new_crack_px": 61
     },
     {
      "frame": 4,
@@ -510,6 +546,7 @@
       "legNear": -25.0,
       "legFar": 25.0,
       "armNear": 20.0,
+      "armFar": -15.0,
       "root": {
        "dy": -0.0
       },
@@ -518,7 +555,7 @@
       "pendant": 0.0
      },
      "new_hole_px": 0,
-     "new_crack_px": 187
+     "new_crack_px": 212
     },
     {
      "frame": 5,
@@ -526,6 +563,7 @@
       "legNear": -21.34,
       "legFar": 21.34,
       "armNear": 14.14,
+      "armFar": -10.61,
       "root": {
        "dy": -3.0
       },
@@ -534,7 +572,7 @@
       "pendant": -2.83
      },
      "new_hole_px": 0,
-     "new_crack_px": 31
+     "new_crack_px": 60
     },
     {
      "frame": 6,
@@ -542,6 +580,7 @@
       "legNear": -12.5,
       "legFar": 12.5,
       "armNear": 0.0,
+      "armFar": -0.0,
       "root": {
        "dy": -6.0
       },
@@ -550,7 +589,7 @@
       "pendant": -4.0
      },
      "new_hole_px": 0,
-     "new_crack_px": 187
+     "new_crack_px": 188
     },
     {
      "frame": 7,
@@ -558,6 +597,7 @@
       "legNear": -3.66,
       "legFar": 3.66,
       "armNear": -14.14,
+      "armFar": 10.61,
       "root": {
        "dy": -3.0
       },
@@ -565,11 +605,11 @@
       "head": 0.0,
       "pendant": -2.83
      },
-     "new_hole_px": 4,
-     "new_crack_px": 16
+     "new_hole_px": 0,
+     "new_crack_px": 31
     }
    ],
-   "formula": "t=2*pi*k/8: legNear=-12.5+12.5 cos t, legFar=12.5-12.5 cos t, armNear=-20 cos t, root.dy=-6(1-cos 2t)/2, tail=5 cos 2t, head=-1.5 cos 2t, pendant=4 sin t; f0 = drawn rest stride = contact A, f4 = contact B"
+   "formula": "t=2*pi*k/8: legNear=-12.5+12.5 cos t, legFar=12.5-12.5 cos t, armNear=-20 cos t, armFar=+15 cos t, root.dy=-6(1-cos 2t)/2, tail=5 cos 2t, head=-1.5 cos 2t, pendant=4 sin t; f0 = drawn rest stride = contact A, f4 = contact B"
   }
  }
 }

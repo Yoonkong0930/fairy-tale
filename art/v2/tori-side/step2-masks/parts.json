@@ -4,7 +4,7 @@
   1024,
   1024
  ],
- "foreground_px": 359554,
+ "foreground_px": 363208,
  "partition_check": {
   "overlap_px": 0,
   "unassigned_fg_px": 0,
@@ -155,7 +155,7 @@
     831,
     630
    ],
-   "area": 190875,
+   "area": 190874,
    "components": 1,
    "note": "head disc incl. stripes, face, cheek, bottom band; ear (in front) and tuft (outside the fitted head ellipse) removed; collar boundary = brown colour edge."
   },
@@ -185,10 +185,10 @@
    "bbox": [
     415,
     613,
-    708,
+    707,
     910
    ],
-   "area": 57581,
+   "area": 56177,
    "components": 1,
    "note": "body incl. collar band, collar-shadow band, belly; bounded by arm (step-1 layer), tail (back edge), hip cut and far leg colour edge."
   },
@@ -197,22 +197,33 @@
     662,
     640,
     733,
-    732
+    731
    ],
-   "area": 4397,
+   "area": 4352,
    "components": 1,
    "note": "acorn only (olive cap/stem + mint nut + highlights)."
   },
   "armNear": {
    "bbox": [
-    496,
-    653,
-    632,
-    819
+    572,
+    663,
+    739,
+    832
    ],
-   "area": 12671,
+   "area": 16046,
    "components": 1,
-   "note": "step-1 arm layer, alpha >= 128."
+   "note": "step-1 arm layer, alpha >= 128 (v2: forward, over the cream belly)."
+  },
+  "armFar": {
+   "bbox": [
+    703,
+    715,
+    767,
+    756
+   ],
+   "area": 1729,
+   "components": 1,
+   "note": "step-1 far-arm layer alpha >= 128 where the step-1 image without the far arm is background (the far arm is behind the body and the acorn)."
   },
   "legNear": {
    "bbox": [
@@ -249,7 +260,6 @@
   }
  },
  "not_visible": {
-  "earFar": "hidden behind the head in cand3",
-  "armFar": "hidden behind the body in cand3"
+  "earFar": "hidden behind the head in cand3"
  }
 }

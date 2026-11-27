@@ -18,13 +18,15 @@ curves; 4x4 supersampled AA.  Front lessons applied:
   * seam un-mix: AA mixes left in a BACK part's boundary row are moved into the FRONT part as a soft
     edge (back px -> its clean local colour), so moving parts leave no dotted line;
   * tuft: one flat fur colour, drawn behind the head, base extended (hidden) under the head.
-Fills
-  torso   : under the arm = the step-1 body pixels (the body the arm was composited onto - exact);
+Fills  (v2: near arm forward over the belly + far arm behind the torso)
+  torso   : under the near arm = the arm-less torso (step-3 work/torso_full.png, de-whitened step-1 body);
             under the head = collar band carried up column-wise + rounded tan neck (front method);
             under the acorn = harmonic SDF of the torso's regions incl. a background class, so the
             belly front silhouette and the collar end continue under the acorn.
   armNear : shoulder end = the same AI arm silhouette rendered without the collar clip (rounded top),
             only where collar_front / head are opaque.
+  armFar  : its hidden shoulder / upper arm behind the torso and the acorn = the complete step-1 far-arm render
+            (own rounded top -> no cut base when it turns).
   legNear / legFar : rounded hip = convex hull of the leg's top rows and a disk around the hip pivot,
             under the torso (and, for the far leg, under the near leg); leg's own flat colour.
   tail    : root behind the torso: convex hull of the tail's cross-section at the junction and a disk about
@@ -42,14 +44,15 @@ ROOT = pathlib.Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 spec = importlib.util.spec_from_file_location("front4", ROOT / "scripts/v2/step4_fill.py")
 F4 = importlib.util.module_from_spec(spec); spec.loader.exec_module(F4)
-from arm_render import render_arm  # noqa: E402
+from arm_render import render_arm  # noqa: E402,F401
+from arm_render2 import render_arm2  # noqa: E402
 
 IN = ROOT / "art/v2/tori-side/step3-layers"
 S1 = ROOT / "art/v2/tori-side/step1-fix"
 OUT = ROOT / "art/v2/tori-side/step4-filled"
 H = W = 1024
-STACK3 = ["tail", "legFar", "legNear", "torso", "pendant", "armNear", "tuft", "head", "earNear"]
-STACK = ["tail", "legFar", "legNear", "torso", "pendant", "armNear", "collar_front", "tuft", "head", "earNear"]
+STACK3 = ["tail", "legFar", "legNear", "armFar", "torso", "pendant", "armNear", "tuft", "head", "earNear"]
+STACK = ["tail", "legFar", "legNear", "armFar", "torso", "pendant", "armNear", "collar_front", "tuft", "head", "earNear"]
 GREEN, DARK = (0x6B, 0xBF, 0x59), (0x20, 0x20, 0x20)
 PAL = {
     "torso": {"tan": (235, 191, 130), "cream": (249, 241, 220), "collar_light": (154, 113, 81),
@@ -60,11 +63,12 @@ PAL = {
     "legNear": {"tan": (235, 191, 130)}, "legFar": {"shade": (205, 147, 99)},
     "earNear": {"tan": (235, 191, 130), "inner": (207, 150, 104)},
     "pendant": {"olive": (111, 112, 68), "mint": (160, 225, 190)},
-    "armNear": {"tan": (235, 191, 130), "shade": (205, 148, 100)},
+    "armNear": {"tan": (235, 191, 130), "shade": (207, 147, 97)},
+    "armFar": {"fill": (205, 148, 100), "shade": (188, 132, 88)},
     "tuft": {"tan": (235, 191, 130)},
 }
 # provisional pivots (final ones in step 5)
-PIV = {"legNear": (490.0, 896.0), "legFar": (628.0, 893.0), "tail": (458.0, 823.0), "armNear": (530.0, 650.0),
+PIV = {"legNear": (490.0, 896.0), "legFar": (628.0, 893.0), "tail": (458.0, 823.0), "armNear": (606.0, 660.0), "armFar": (690.0, 702.0),
        "head": (565.0, 618.0), "earNear": (478.0, 236.0), "tuft": (590.0, 170.0), "pendant": (679.0, 643.0),
        "torso": (560.0, 880.0)}
 LEG_DISKS = {"legNear": [((490.0, 896.0), 54.0), ((505.0, 896.0), 44.0)], "legFar": [((628.0, 893.0), 48.0), ((650.0, 880.0), 38.0)]}
@@ -121,25 +125,42 @@ class Fill:
         return z
 
     # ------------------------------------------------------------ collar_front + arm shoulder
+    def near_arm_full(self):
+        """the near arm rendered WITHOUT the collar clip (its own rounded top), as in step 1 otherwise."""
+        rep = json.loads((S1 / "fix-report.json").read_text())["arm"]
+        pb = rep["band_bottom_poly"]
+        tan = np.array(rep["colours"]["tan"], float); band = np.array(rep["colours"]["shade/band"], float)
+        shade = np.array(rep["colours"].get("shade", [207, 147, 97]), float)
+        params = dict(rep["transform"]); params["src"] = tuple(params["src"]); params["dst"] = tuple(params["dst"])
+        A, C, _ = render_arm2(params, lambda X: np.full(X.shape, -1e9), lambda X: np.polyval(pb, np.clip(X, 458, 600)),
+                              {"fill": tan, "shade": shade, "band": band}, (450, 560, 800, 900))
+        return A, C
+
     def collar_front(self):
         T = self.L["torso"]
+        Tf = np.asarray(Image.open(IN / "work/torso_full.png").convert("RGBA")).astype(float)
         names, lab, cols = F4.classify(T, PAL["torso"])
         collar = np.isin(lab, [names.index("collar_dark"), names.index("collar_light")])
         xx = np.arange(W)[None, :].repeat(H, 0); yy = np.arange(H)[:, None].repeat(W, 1)
-        span = (xx >= 470) & (xx <= 615) & (yy > 600) & (yy < 700)
+        self.armfull = self.near_arm_full()
+        Afull, Cfull = self.armfull
+        cols_arm = np.nonzero((Afull[:700] > 0).any(0))[0]
+        x0s, x1s = int(cols_arm.min()) - 12, int(cols_arm.max()) + 12
+        span = (xx >= x0s) & (xx <= x1s) & (yy > 600) & (yy < 700)
         armA = self.L["armNear"][..., 3].astype(float) / 255
         core = collar & span & (T[..., 3] == 255)
         pure = core & (armA == 0)
         cf = np.zeros_like(T)
         cf[pure] = T[pure]
-        # collar px partly covered by the step-1 arm + the collar's bottom AA rows: rest colour C (arm over
-        # torso, step 3) = b * collar + (1-b) * band -> collar_front gets (c, b), the torso px -> clean band
-        # (seam exception, rest preserved; the arm there is band-coloured too)
-        band = cols[names.index("band")]
+        # collar px partly covered by the step-1 arm + the collar's bottom AA rows: rest colour C (arm over torso,
+        # step 3) = b * collar + (1-b) * U, U = what lies under collar_front once the arm has its full shoulder
+        # (full arm over the arm-less torso); collar_front gets (c, b); torso px -> arm-less torso colour and the
+        # arm px -> full arm (seam exceptions, rest preserved)
         Crest = armA[..., None] * self.L["armNear"][..., :3] + (1 - armA[..., None]) * T[..., :3]
+        U = Afull[..., None] * Cfull + (1 - Afull[..., None]) * Tf[..., :3]
         below = span & ~core & (T[..., 3] == 255) & ndi.binary_dilation(core, iterations=3) & (yy > 640)
-        aa = (core & (armA > 0)) | below
-        n = 0
+        aa = ((core & (armA > 0)) | below) & (Tf[..., 3] == 255)
+        n, res = 0, []
         for y, x in zip(*np.nonzero(aa)):
             win = cf[max(0, y - 6):y + 1, max(0, x - 6):x + 7]
             ok = win[..., 3] == 255
@@ -149,48 +170,56 @@ class Fill:
                 if ok.sum() < 2:
                     continue
             cc = np.median(win[ok][:, :3].astype(float), 0)
-            C = Crest[y, x]
-            d = cc - band
-            bval = float(np.clip(np.dot(C - band, d) / max(np.dot(d, d), 1e-6), 0, 1))
+            C = Crest[y, x]; u = U[y, x]
+            d = cc - u
+            bval = float(np.clip(np.dot(C - u, d) / max(np.dot(d, d), 1e-6), 0, 1))
             b8 = int(round(bval * 255))
             if b8 < 4:
-                continue
-            self.new["torso"][y, x, :3] = np.round(band).astype(np.uint8)
+                if np.abs(C - u).max() > 3:
+                    continue
+            else:
+                bb = b8 / 255
+                col = np.clip(np.round((C - (1 - bb) * u) / bb), 0, 255)
+                cf[y, x, :3] = col; cf[y, x, 3] = b8
+                self.seam["collar_front"][y, x] = True
+                res.append(float(np.abs(bb * col + (1 - bb) * u - C).max()))
+            self.new["torso"][y, x] = np.round(Tf[y, x]).astype(np.uint8)
             self.seam["torso"][y, x] = True
-            bb = b8 / 255
-            col = np.clip(np.round((C - (1 - bb) * band) / bb), 0, 255)
-            cf[y, x, :3] = col; cf[y, x, 3] = b8
-            self.seam["collar_front"][y, x] = True
+            if Afull[y, x] > 0:
+                self.new["armNear"][y, x, :3] = np.round(Cfull[y, x]).clip(0, 255).astype(np.uint8)
+                self.new["armNear"][y, x, 3] = int(round(Afull[y, x] * 255))
+                self.seam["armNear"][y, x] = True
             n += 1
         self.L["collar_front"] = cf.copy()
         self.new["collar_front"] = cf
         self.added["collar_front"] = np.zeros((H, W), bool)
-        self.notes["collar_front"] = [f"torso's own opaque collar px over the arm's shoulder (x 470-615), byte copies "
-                                      f"[{int(pure.sum())} px] + {n} collar-bottom AA px un-mixed (alpha by projection "
-                                      f"collar->band; the torso px under them set to the clean band colour)"]
-        self.exceptions["torso|collar_front"] = {"px": n, "why": "collar bottom AA moved into collar_front so the arm's "
-                                                 "shoulder can pass under it without a hard edge"}
+        self.notes["collar_front"] = [f"torso's own opaque collar px over the near arm's shoulder (x {x0s}-{x1s}), byte "
+                                      f"copies [{int(pure.sum())} px] + {n} collar-bottom AA px un-mixed (alpha by "
+                                      f"projection collar -> what lies under it; torso px there -> arm-less torso, arm px "
+                                      f"-> full arm)"]
+        self.exceptions["torso|collar_front"] = {"px": n, "max_rest_residual": round(max(res), 2) if res else 0,
+                                                 "why": "collar bottom AA moved into collar_front so the arm's shoulder "
+                                                        "can pass under it without a hard edge"}
 
     def arm(self):
-        rep = json.loads((S1 / "fix-report.json").read_text())["arm"]
-        pc, pb = rep["collar_bottom_poly"], rep["band_bottom_poly"]
-        tan = np.array(rep["colours"]["tan"], float); sh = np.array(rep["colours"]["shade/band"], float)
-        params = dict(rep["transform"]); params["src"] = tuple(params["src"]); params["dst"] = tuple(params["dst"])
-        A, C, _ = render_arm(params, lambda X: np.full(X.shape, -1e9), lambda X: np.polyval(pb, X), tan, sh, sh,
-                             box=(380, 560, 680, 900))
+        A, C = self.armfull
         a8 = np.round(A * 255).astype(np.uint8)
         rgb8 = np.round(C).clip(0, 255).astype(np.uint8)
         self.put("armNear", a8, rgb8, "rounded shoulder end: the step-1 AI arm silhouette rendered WITHOUT the collar "
                                       "clip (its own rounded top), band colour, only under collar_front / head")
+        far = np.asarray(Image.open(S1 / "work/farArm_layer.png").convert("RGBA"))
+        self.put("armFar", far[..., 3], far[..., :3], "hidden part of the far arm (shoulder / upper arm behind the "
+                                                      "torso and the acorn) = the complete step-1 far-arm render: its "
+                                                      "own rounded top, no cut base")
 
     # ------------------------------------------------------------ torso
     def torso(self):
         p = "torso"
-        body = np.asarray(Image.open(S1 / "work/body_under_arm.png").convert("RGB"))
-        z = self.hz(p) & (self.L["armNear"][..., 3] == 255)
-        a8 = np.where(z, 255, 0).astype(np.uint8)
-        self.put(p, a8, body, "under the arm: the step-1 body pixels (the image before the arm was composited: "
-                              "cand3's own body with the U-line painted out) - exact")
+        Tf = np.asarray(Image.open(IN / "work/torso_full.png").convert("RGBA"))
+        z = self.hz(p) & (self.L["armNear"][..., 3] == 255) & (Tf[..., 3] > 0)
+        a8 = np.where(z, Tf[..., 3], 0).astype(np.uint8)
+        self.put(p, a8, Tf[..., :3], "under the near arm: the arm-less torso (step-3 work/torso_full.png = the step-1 "
+                                     "body before the arms, de-whitened) - exact, incl. its belly-front silhouette")
         self.neck()
         self.under_pendant()
 
@@ -250,7 +279,9 @@ class Fill:
 
     def under_pendant(self):
         p = "torso"
-        T = self.L[p]
+        # v2: classified on the arm-less torso (step-3 work/torso_full.png), so the region under the near arm
+        # is torso, not background
+        T = np.asarray(Image.open(IN / "work/torso_full.png").convert("RGBA"))
         pal = dict(PAL[p]); pal["bg"] = (255, 255, 255)
         names, lab, cols = F4.classify(T, PAL[p])
         kb = len(names)
@@ -376,6 +407,7 @@ class Fill:
 
     # ------------------------------------------------------------ seams
     SEAM_PAIRS = [("torso", "head"), ("tail", "torso"), ("legNear", "torso"), ("legFar", "torso"),
+                  ("armFar", "torso"), ("armFar", "pendant"),
                   ("legFar", "legNear"), ("torso", "pendant"), ("head", "earNear"), ("tail", "legNear")]
     SEAM_TOL = 12
 
@@ -494,8 +526,10 @@ def poses():
         ("rest", {}, (120, 40, 860, 1000)),
         ("legs: near +25, far -25 (walk contact A)", {"legNear": 25, "legFar": -25}, (360, 780, 780, 1000)),
         ("legs: near -25, far +25 (walk contact B)", {"legNear": -25, "legFar": 25}, (360, 780, 780, 1000)),
-        ("arm +30 (ccw: paw forward)", {"armNear": 30}, (420, 580, 720, 880)),
-        ("arm -30 (cw: paw back)", {"armNear": -30}, (420, 580, 720, 880)),
+        ("arm +30 (ccw: paw forward)", {"armNear": 30}, (480, 580, 800, 880)),
+        ("arm -30 (cw: paw back)", {"armNear": -30}, (480, 580, 800, 880)),
+        ("far arm +20 (ccw: paw up/forward)", {"armFar": 20}, (600, 600, 820, 820)),
+        ("far arm -20 (cw: paw down/back)", {"armFar": -20}, (600, 600, 820, 820)),
         ("head +8", {"head": 8}, B),
         ("head -8", {"head": -8}, B),
         ("ear +15", {"earNear": 15}, (380, 80, 600, 300)),

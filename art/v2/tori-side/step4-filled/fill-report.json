@@ -4,6 +4,7 @@
   "tail",
   "legFar",
   "legNear",
+  "armFar",
   "torso",
   "pendant",
   "armNear",
@@ -30,82 +31,96 @@
    "visible_px_changed_outside_listed_exceptions": 0
   },
   "legFar": {
-   "added_px": 4006,
+   "added_px": 4012,
    "added_bbox": [
     580,
     842,
     683,
-    907
+    908
    ],
    "method": [
     "EXCEPTION seam un-mix vs torso: 24 boundary px -> clean colour",
-    "rounded hip: convex hull of the leg's top 30 rows and disk(s) [((628.0, 893.0), 48.0), ((650.0, 880.0), 38.0)] (first = about the hip pivot), kept inside the body; the leg's own flat colour [4006 px]"
+    "rounded hip: convex hull of the leg's top 30 rows and disk(s) [((628.0, 893.0), 48.0), ((650.0, 880.0), 38.0)] (first = about the hip pivot), kept inside the body; the leg's own flat colour [4012 px]"
    ],
    "visible_px_changed": 24,
    "visible_px_changed_outside_listed_exceptions": 0
   },
   "legNear": {
-   "added_px": 4845,
+   "added_px": 4846,
    "added_bbox": [
-    442,
+    440,
     842,
     550,
     905
    ],
    "method": [
-    "rounded hip: convex hull of the leg's top 30 rows and disk(s) [((490.0, 896.0), 54.0), ((505.0, 896.0), 44.0)] (first = about the hip pivot), kept inside the body; the leg's own flat colour [4845 px]"
+    "rounded hip: convex hull of the leg's top 30 rows and disk(s) [((490.0, 896.0), 54.0), ((505.0, 896.0), 44.0)] (first = about the hip pivot), kept inside the body; the leg's own flat colour [4846 px]"
+   ],
+   "visible_px_changed": 0,
+   "visible_px_changed_outside_listed_exceptions": 0
+  },
+  "armFar": {
+   "added_px": 1559,
+   "added_bbox": [
+    678,
+    686,
+    725,
+    743
+   ],
+   "method": [
+    "hidden part of the far arm (shoulder / upper arm behind the torso and the acorn) = the complete step-1 far-arm render: its own rounded top, no cut base [1559 px]"
    ],
    "visible_px_changed": 0,
    "visible_px_changed_outside_listed_exceptions": 0
   },
   "torso": {
-   "added_px": 25540,
+   "added_px": 26988,
    "added_bbox": [
     447,
     566,
-    703,
-    818
+    708,
+    830
    ],
    "method": [
-    "under the arm: the step-1 body pixels (the image before the arm was composited: cand3's own body with the U-line painted out) - exact [12417 px]",
+    "under the near arm: the arm-less torso (step-3 work/torso_full.png = the step-1 body before the arms, de-whitened) - exact, incl. its belly-front silhouette [13852 px]",
     "under the head: collar band carried up column-wise (each column its own collar colour) 14 px + rounded tan neck (40 px, inset 14) [11560 px]",
-    "under the acorn: torso regions incl. a background class continued by harmonic SDF (belly front silhouette, collar end, cream, band), flat colours, AA coverage [1563 px]",
+    "under the acorn: torso regions incl. a background class continued by harmonic SDF (belly front silhouette, collar end, cream, band), flat colours, AA coverage [1576 px]",
     "EXCEPTION seam un-mix vs head: 227 boundary px -> clean colour",
     "EXCEPTION seam un-mix over tail: 24 soft edge px added",
     "EXCEPTION seam un-mix over legFar: 24 soft edge px added",
-    "EXCEPTION seam un-mix vs pendant: 67 boundary px -> clean colour"
+    "EXCEPTION seam un-mix vs pendant: 61 boundary px -> clean colour"
    ],
-   "visible_px_changed": 504,
+   "visible_px_changed": 357,
    "visible_px_changed_outside_listed_exceptions": 0
   },
   "pendant": {
    "added_px": 0,
    "added_bbox": null,
    "method": [
-    "EXCEPTION seam un-mix over torso: 67 soft edge px added"
+    "EXCEPTION seam un-mix over torso: 61 soft edge px added"
    ],
    "visible_px_changed": 0,
    "visible_px_changed_outside_listed_exceptions": 0
   },
   "armNear": {
-   "added_px": 1444,
+   "added_px": 2269,
    "added_bbox": [
-    501,
-    630,
-    569,
-    663
+    573,
+    627,
+    652,
+    664
    ],
    "method": [
-    "rounded shoulder end: the step-1 AI arm silhouette rendered WITHOUT the collar clip (its own rounded top), band colour, only under collar_front / head [1444 px]"
+    "rounded shoulder end: the step-1 AI arm silhouette rendered WITHOUT the collar clip (its own rounded top), band colour, only under collar_front / head [2269 px]"
    ],
-   "visible_px_changed": 0,
+   "visible_px_changed": 58,
    "visible_px_changed_outside_listed_exceptions": 0
   },
   "collar_front": {
    "added_px": 0,
    "added_bbox": null,
    "method": [
-    "torso's own opaque collar px over the arm's shoulder (x 470-615), byte copies [4416 px] + 169 collar-bottom AA px un-mixed (alpha by projection collar->band; the torso px under them set to the clean band colour)"
+    "torso's own opaque collar px over the near arm's shoulder (x 560-675), byte copies [4078 px] + 205 collar-bottom AA px un-mixed (alpha by projection collar -> what lies under it; torso px there -> arm-less torso, arm px -> full arm)"
    ],
    "visible_px_changed": 0,
    "visible_px_changed_outside_listed_exceptions": 0
@@ -154,7 +169,8 @@
  },
  "exceptions": {
   "torso|collar_front": {
-   "px": 169,
+   "px": 205,
+   "max_rest_residual": 4.44,
    "why": "collar bottom AA moved into collar_front so the arm's shoulder can pass under it without a hard edge"
   },
   "torso|head": {
@@ -173,8 +189,8 @@
    "unmix_residual_max": 0.24
   },
   "torso|pendant": {
-   "back_visible_px_recoloured": 67,
-   "front_soft_edge_px_added": 67,
+   "back_visible_px_recoloured": 61,
+   "front_soft_edge_px_added": 61,
    "unmix_residual_max": 0.39
   },
   "head|earNear": {
@@ -183,8 +199,8 @@
    "unmix_residual_max": 0.45
   },
   "torso|head (rim)": {
-   "px": 268,
-   "max_rest_residual": 4.49,
+   "px": 296,
+   "max_rest_residual": 5.76,
    "why": "front step-5 method: torso px within 2 px of the opaque head still carrying the head's light rim AA (head alpha jumps 255 -> 0 in step 3) -> clean collar colour (median of torso px 3-7 rows below); head gets a soft edge px (alpha by projection toward the nearest opaque head colour) so the rest composite is unchanged up to the reported residual (<= 10, mixes that are not exactly on the head/collar line)."
   },
   "tuft_flat": {
@@ -204,9 +220,9 @@
     686.5
    ],
    "collar_top_poly": [
-    -0.0010092779972107934,
-    1.1688110211705653,
-    291.7211058607015
+    -0.001011208759547981,
+    1.1708983127412687,
+    291.1633806110185
    ],
    "collar_up_px": 14.0,
    "neck_h": 40.0,
@@ -283,21 +299,21 @@
  },
  "rest_pose_step4_vs_step3": {
   "white": {
-   "max_outside_tuft": 4,
-   "px_diff_gt2_outside_tuft": 4,
-   "px_diff_outside_tuft": 38,
+   "max_outside_tuft": 6,
+   "px_diff_gt2_outside_tuft": 5,
+   "px_diff_outside_tuft": 21,
    "tuft_area_max (flattened)": 40
   },
   "green": {
-   "max_outside_tuft": 4,
-   "px_diff_gt2_outside_tuft": 4,
-   "px_diff_outside_tuft": 38,
+   "max_outside_tuft": 6,
+   "px_diff_gt2_outside_tuft": 5,
+   "px_diff_outside_tuft": 21,
    "tuft_area_max (flattened)": 40
   },
   "dark": {
-   "max_outside_tuft": 4,
-   "px_diff_gt2_outside_tuft": 4,
-   "px_diff_outside_tuft": 38,
+   "max_outside_tuft": 6,
+   "px_diff_gt2_outside_tuft": 5,
+   "px_diff_outside_tuft": 21,
    "tuft_area_max (flattened)": 40
   }
  },
@@ -315,8 +331,12 @@
    823.0
   ],
   "armNear": [
-   530.0,
-   650.0
+   606.0,
+   660.0
+  ],
+  "armFar": [
+   690.0,
+   702.0
   ],
   "head": [
    565.0,
@@ -357,12 +377,22 @@
   },
   {
    "pose": "arm +30 (ccw: paw forward)",
-   "holes_before": 7775,
+   "holes_before": 0,
    "holes_after": 0
   },
   {
    "pose": "arm -30 (cw: paw back)",
-   "holes_before": 7769,
+   "holes_before": 0,
+   "holes_after": 0
+  },
+  {
+   "pose": "far arm +20 (ccw: paw up/forward)",
+   "holes_before": 1,
+   "holes_after": 2
+  },
+  {
+   "pose": "far arm -20 (cw: paw down/back)",
+   "holes_before": 46,
    "holes_after": 0
   },
   {
@@ -407,12 +437,12 @@
   },
   {
    "pose": "pendant +10",
-   "holes_before": 8,
+   "holes_before": 771,
    "holes_after": 7
   },
   {
    "pose": "pendant -10",
-   "holes_before": 2,
+   "holes_before": 10,
    "holes_after": 1
   }
  ]
